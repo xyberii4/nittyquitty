@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/nittyquitty/internal/routes"
+	"github.com/nittyquitty/internal/database"
 )
 
 func main() {
@@ -13,4 +14,6 @@ func main() {
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		log.Fatalf("Could not start server: %v\n", err)
 	}
+	database.insert("nittyquitty", "nitty@quitty.com", "IAMANITTY420")
+	database.query(1)
 }
