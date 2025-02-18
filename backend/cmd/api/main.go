@@ -1,19 +1,11 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
-	"github.com/nittyquitty/internal/routes"
-	"github.com/nittyquitty/internal/database"
+	"github.com/nittyquitty/internal/utils"
 )
 
 func main() {
-	r := routes.SetupRouter()
-	log.Println("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", r); err != nil {
-		log.Fatalf("Could not start server: %v\n", err)
-	}
-	database.insert("nittyquitty", "nitty@quitty.com", "IAMANITTY420")
-	database.query(1)
+	// Create logger
+	utils.InitLogger("api.log")
+	defer utils.Logger.Println("API stopped")
 }
