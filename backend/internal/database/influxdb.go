@@ -9,13 +9,14 @@ import (
 	"github.com/nittyquitty/internal/utils"
 )
 
-type Client struct {
+type InfluxdbClient struct {
 	client influxdb2.Client
 	org    string
 	bucket string
 }
 
-func NewClient(cfg config.InfluxDBConfig) (*Client, error) {
+// Creates a new InfluxDB client
+func NewInfluxDBClient(cfg config.InfluxDBConfig) (*InfluxdbClient, error) {
 	client := influxdb2.NewClient(fmt.Sprintf("%s:%s", cfg.Url, cfg.Port), cfg.Token)
 
 	// Check client health
@@ -30,9 +31,14 @@ func NewClient(cfg config.InfluxDBConfig) (*Client, error) {
 		return nil, fmt.Errorf("influxDB health check failed: %v", health)
 	}
 
-	return &Client{
+	return &InfluxdbClient{
 		client: client,
 		org:    cfg.Org,
 		bucket: cfg.Bucket,
 	}, nil
+}
+
+// Closes the InfluxDB client
+func (c *InfluxdbClient) Close() {
+	c.client.Close()
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/nittyquitty/internal/config"
 )
 
-func TestNewClient(t *testing.T) {
+func TestNewInfluxDBClient(t *testing.T) {
 	if err := godotenv.Load("../../.env"); err != nil {
 		t.Errorf("Error loading .env file: %v", err)
 	}
@@ -17,10 +17,10 @@ func TestNewClient(t *testing.T) {
 		Token: os.Getenv("INFLUX_TOKEN"),
 		Port:  os.Getenv("INFLUX_PORT"),
 	}
-	c, err := NewClient(cfg)
+	c, err := NewInfluxDBClient(cfg)
 
 	defer func() {
-		c.client.Close()
+		c.Close()
 	}()
 
 	if err != nil {
