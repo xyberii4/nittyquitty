@@ -1,10 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/nittyquitty/internal/utils"
 )
 
 type InfluxDBConfig struct {
@@ -28,9 +28,9 @@ type Config struct {
 	MySQL    MySQLConfig
 }
 
-func Load() Config {
+func Load() (*Config, error) {
 	if err := godotenv.Load(); err != nil {
-		utils.Logger.Fatalf("Error loading .env file: %v", err)
+		return nil, fmt.Errorf("Error loading .env file: %v", err)
 	}
 
 	inflxCfg := InfluxDBConfig{
@@ -49,10 +49,8 @@ func Load() Config {
 		Database: os.Getenv("MYSQL_DATABASE"),
 	}
 
-	utils.Logger.Println("Environment variables loaded successfully")
-
-	return Config{
+	return &Config{
 		InfluxDB: inflxCfg,
 		MySQL:    mysqlCfg,
-	}
+	}, nil
 }
