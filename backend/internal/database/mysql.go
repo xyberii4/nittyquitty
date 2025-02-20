@@ -3,43 +3,39 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/nittyquitty/internal/config"
+	"github.com/nittyquitty/internal/utils"
 )
 
-func connect() *sql.DB {
-	database_username := "DB_USERNAME" // Find username somehow
-	database_password := "DB_PASSWORD" // Find password somehow
-	database_name := "DB_NAME"         // Find database name somehow
-	host := "DB_HOST"                  // Find host somehow
-	port := "DB_PORT"                  // Find port somehow
+type MySQLClient struct {
+	client *sql.DB
+}
 
-	sql_connection := database_username + ":" + database_password + "@tcp(" + host + ":" + port + ")/" + database_name
+// Creates a new MySQL client
+func NewMySQLClient(cfg config.MySQLConfig) (*MySQLClient, error) {
+	sql_connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
 	// Connect to database
-	database, error := sql.Open("mysql", sql_connection)
-	if error != nil {
-		log.Fatal(error)
+	database, err := sql.Open("mysql", sql_connection)
+	if err != nil {
+		utils.Logger.Printf("Failed to connect to MySQL: %v", err)
+		return nil, fmt.Errorf("failed to connect to MySQL: %v", err)
 	}
-	defer database.Close()
-	return database
+
+	// Check connection
+	if err := database.Ping(); err != nil {
+		utils.Logger.Printf("Failed to ping MySQL: %v", err)
+		return nil, fmt.Errorf("failed to ping MySQL: %v", err)
+	}
+
+	return &MySQLClient{
+		client: database,
+	}, nil
 }
 
-func insert(username string, email string, password string) {
-	db := connect()
-	_, error := db.Exec("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", username, email, password)
-	if error != nil {
-		log.Fatal(error)
-	}
-}
-
-func query(id int) {
-	// Example query for instance getting first 10 users idk
-	db := connect()
-	var username, email string
-	row := db.QueryRow("SELECT username, email FROM users WHERE id = ?", id)
-	if err := row.Scan(&username, &email); err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Username: %s, Email: %s\n", username, email)
+// Closes the MySQL client
+func (c *MySQLClient) Close() {
+	c.client.Close()
+	utils.Logger.Println("MySQL client closed")
 }
