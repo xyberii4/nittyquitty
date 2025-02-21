@@ -51,8 +51,7 @@ func (c *InfluxdbClient) WriteData(n models.NicotineConsumption) error {
 	// Convert to InfluxDB point
 	point := n.ToInfluxPoint()
 
-	err := writeAPI.WritePoint(context.Background(), point)
-	if err != nil {
+	if err := writeAPI.WritePoint(context.Background(), point); err != nil {
 		utils.Logger.Printf("Failed to write data to InfluxDB: %v", err)
 		return fmt.Errorf("failed to write data to InfluxDB: %v", err)
 	}
