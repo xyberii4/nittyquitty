@@ -15,6 +15,20 @@ type NicotineConsumption struct {
 	Cost     float64
 }
 
+type UserData struct {
+	UserID          int
+	Username        string
+	Password        string
+	Snus            bool
+	SnusWeeklyUsage int
+	SnusStrength    int
+	Vape            bool
+	VapeWeeklyUsage int
+	VapeStrength    int
+	Cigarette       bool
+	CigWeeklyUsage  int
+}
+
 // Converts NicotineConsumption to InfluxDB point
 func (n *NicotineConsumption) ToInfluxPoint() *write.Point {
 	return write.NewPoint(
