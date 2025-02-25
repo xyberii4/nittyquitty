@@ -14,6 +14,7 @@ var (
 	mysqlClient    *MySQLClient
 )
 
+
 // Test entry point
 func TestMain(m *testing.M) {
 	utils.InitLogger("test.log")
