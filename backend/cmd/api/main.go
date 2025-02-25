@@ -1,8 +1,11 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/nittyquitty/internal/config"
 	"github.com/nittyquitty/internal/database"
+	"github.com/nittyquitty/internal/routes"
 	"github.com/nittyquitty/internal/utils"
 )
 
@@ -35,4 +38,10 @@ func main() {
 	defer MySQLClient.Close()
 
 	utils.Logger.Println("MySQL client initialized successfully")
+
+	r := routes.Setup(InfluxDBClient, MySQLClient)
+	utils.Logger.Println("API started")
+	if err := http.ListenAndServe(":8080", r); err != nil {
+		utils.Logger.Fatalf("Failed to start API: %v", err)
+	}
 }
