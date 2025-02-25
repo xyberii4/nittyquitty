@@ -8,11 +8,11 @@ import (
 
 // Struct for each time the user consumes nicotine
 type NicotineConsumption struct {
-	Product  string // Vape/Cigarette/Snus/etc
-	UserID   string // Same as MySQL
-	Mg       float64
-	Quantity int
-	Cost     float64
+	Product  string  `json:"product"`  // Vape/Cigarette/Snus/etc
+	UserID   string  `json:"userID"`   // Same as MySQL
+	Mg       float64 `json:"mg"`       // Nicotine amount in mg
+	Quantity int     `json:"quantity"` // Quantity consumed
+	Cost     float64 `json:"cost"`     // Cost of the product
 }
 
 type UserData struct {
