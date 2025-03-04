@@ -2,13 +2,16 @@ package routes
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/nittyquitty/internal/database"
 	"github.com/nittyquitty/internal/handlers"
 )
 
-func SetupRouter() *chi.Mux {
+func Setup(ic *database.InfluxdbClient, mc *database.MySQLClient) chi.Router {
+	handler := handlers.NewHandler(ic, mc)
+
 	r := chi.NewRouter()
 
-	r.Get("/", handlers.Test)
-
+	r.Get("/api/health", handler.HealthCheck)
+	r.Post("/api/logUsage", handler.LogNicUsage)
 	return r
 }
