@@ -66,7 +66,7 @@ class InputNicScreen extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => CustomScreen()),
                     );
                   },
-                  child: Text('Customer'),
+                  child: Text('Custom'),
                 ),
               ],
             ),
