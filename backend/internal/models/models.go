@@ -16,17 +16,17 @@ type NicotineConsumption struct {
 }
 
 type UserData struct {
-	UserID          int
-	Username        string
-	Password        string
-	Snus            bool
-	SnusWeeklyUsage int
-	SnusStrength    int
-	Vape            bool
-	VapeWeeklyUsage int
-	VapeStrength    int
-	Cigarette       bool
-	CigWeeklyUsage  int
+	UserID          int    `json:"user_id"`
+	Username        string `json:"username"`
+	Password        string `json:"password"`
+	Snus            bool   `json:"snus"`
+	SnusWeeklyUsage int    `json:"snus_weekly_usage"`
+	SnusStrength    int    `json:"snus_strength"`
+	Vape            bool   `json:"vape"`
+	VapeWeeklyUsage int    `json:"vape_weekly_usage"`
+	VapeStrength    int    `json:"vape_strength"`
+	Cigarette       bool   `json:"cigarette"`
+	CigWeeklyUsage  int    `json:"cig_weekly_usage"`
 }
 
 // Converts NicotineConsumption to InfluxDB point
