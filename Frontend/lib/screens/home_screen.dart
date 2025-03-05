@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
     InputNicScreen(),
     MainHomeScreen(),
     AnalyticsScreen(),
-    PeopleScreen(),
+    CommunityScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Input Nic'),
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.assessment), label: 'Analytics'),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'People'),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Community'),
         ],
       ),
     );
