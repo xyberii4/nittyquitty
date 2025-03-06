@@ -59,3 +59,40 @@ func (c *InfluxdbClient) WriteData(n models.NicotineConsumption) error {
 	utils.Logger.Printf("Data written to InfluxDB: %v", n)
 	return nil
 }
+
+// Query data for given user, start and stop must be in RFC3339 format (YYYY-MM-DDTHH:MM:SSZ)
+func (c *InfluxdbClient) GetUserData(user models.UserData, start, end string) ([]models.NicotineConsumption, error) {
+	queryAPI := c.client.QueryAPI(c.org)
+	query := fmt.Sprintf(`
+    from(bucket: "%s")
+    |> range(start: %s, stop: %s)
+    |> filter(fn: (r) => r.user_id == "%d")
+    `, c.bucket, start, end, user.UserID)
+
+	result, err := queryAPI.Query(context.Background(), query)
+	if err != nil {
+		utils.Logger.Printf("Failed to query InfluxDB: %v", err)
+		return nil, fmt.Errorf("failed to query InfluxDB: %v", err)
+	}
+
+	var rows []models.NicotineConsumption
+
+	for result.Next() {
+		row := models.NicotineConsumption{
+			Product: result.Record().ValueByKey("product").(string),
+			UserID:  result.Record().ValueByKey("user_id").(string),
+		}
+		switch result.Record().Field() {
+		case "mg":
+			row.Mg = result.Record().Value().(float64)
+		case "quantity":
+			row.Quantity = int(result.Record().Value().(int64))
+		case "cost":
+			row.Cost = result.Record().Value().(float64)
+		}
+
+		rows = append(rows, row)
+	}
+
+	return rows, nil
+}
