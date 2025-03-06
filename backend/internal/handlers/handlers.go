@@ -75,3 +75,32 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 
 	utils.Logger.Println("Data written to MySQL")
 }
+
+func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) {
+	utils.Logger.Println("/api/getUser endpoint hit")
+	w.Header().Set("Content-Type", "application/json")
+
+	// Check if request body matches expected struct
+	var user models.UserData
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	// Read from MySQL
+	user, err := h.MySQLClient.GetUser(user.UserID)
+	if err != nil {
+		http.Error(w, "Failed to read data from MySQL", http.StatusInternalServerError)
+		utils.Logger.Printf("Failed to read data from MySQL: %v", err)
+		return
+	}
+
+	// Write response
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		utils.Logger.Printf("Failed to encode response: %v", err)
+		return
+	}
+
+	utils.Logger.Println("Data read from MySQL")
+}
