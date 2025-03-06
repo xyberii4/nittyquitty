@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -13,7 +14,6 @@ var (
 	influxdbClient *InfluxdbClient
 	mysqlClient    *MySQLClient
 )
-
 
 // Test entry point
 func TestMain(m *testing.M) {
@@ -36,6 +36,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		utils.Logger.Fatalf("Failed to create InfluxDB client: %v", err)
 	}
+	fmt.Println("InfluxDB client created")
 
 	// Create MySQL client
 	mysqlcfg := config.MySQLConfig{
@@ -50,6 +51,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		utils.Logger.Fatalf("Failed to create MySQL client: %v", err)
 	}
+
+	fmt.Println("MySQL client created")
 
 	// Run all tests
 	code := m.Run()
