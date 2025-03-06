@@ -70,10 +70,8 @@ func (c *MySQLClient) Close() {
 	utils.Logger.Println("MySQL client closed")
 }
 
-
 // Adds user to MySQL
 func (c *MySQLClient) AddUser(n models.UserData) error {
-
 	// Prepare statement
 	stmt, err := c.client.Prepare(fmt.Sprintf("INSERT INTO Users (UserID, Username, Password, Snus, SnusWeeklyUsage, SnusStrength, Vape, VapeWeeklyUsage, VapeStrength, Cigarette, CigWeeklyUsage) VALUES (%d, %s, %s, %t, %d, %d, %t, %d, %d, %t, %d)", n.UserID, n.Username, n.Password, n.Snus, n.SnusWeeklyUsage, n.SnusStrength, n.Vape, n.VapeWeeklyUsage, n.VapeStrength, n.Cigarette, n.CigWeeklyUsage))
 	if err != nil {
@@ -91,10 +89,8 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 	return nil
 }
 
-
 // Retrieves user from MySQL
 func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
-	
 	// Prepare statement
 	stmt, err := c.client.Prepare(fmt.Sprintf("SELECT * FROM Users WHERE UserID = %d", userID))
 	if err != nil {

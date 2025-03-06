@@ -28,8 +28,6 @@ func (h *Handler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"alive": true}`))
 }
 
-
-
 // Adds users' nicotine usage to InfluxDB
 func (h *Handler) LogNicUsage(w http.ResponseWriter, r *http.Request) {
 	utils.Logger.Println("/api/logUsage endpoint hit")
@@ -52,8 +50,6 @@ func (h *Handler) LogNicUsage(w http.ResponseWriter, r *http.Request) {
 	utils.Logger.Println("Data written to InfluxDB") // include username asw
 }
 
-
-
 // Add new user to MySQL
 func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	utils.Logger.Println("/api/addUser endpoint hit")
@@ -75,3 +71,4 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 
 	utils.Logger.Println("Data written to MySQL")
 }
+
