@@ -15,6 +15,13 @@ type NicotineConsumption struct {
 	Cost     float64 `json:"cost"`     // Cost of the product
 }
 
+// ConsumptionRequest struct with JSON tags
+type ConsumptionRequest struct {
+	UserID    int    `json:"user_id"`
+	StartDate string `json:"start_date"`
+	EndDate   string `json:"end_date"`
+}
+
 // User struct with JSON tags
 type UserData struct {
 	UserID          int    `json:"user_id"`

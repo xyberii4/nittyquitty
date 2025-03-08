@@ -71,3 +71,40 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 
 	utils.Logger.Println("Data written to MySQL")
 }
+
+// Get user consumption data for given userID
+func (h *Handler) GetUserConsumption(w http.ResponseWriter, r *http.Request) {
+	utils.Logger.Println("/api/getUserConsumption endpoint hit")
+
+	// Map request body to struct
+	var cRequest models.ConsumptionRequest
+	err := json.NewDecoder(r.Body).Decode(&cRequest)
+	if err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	user := models.UserData{
+		UserID: int(cRequest.UserID),
+	}
+
+	// Retrieve rows from InfluxDB
+	results, err := h.InfluxDBClient.GetUserData(user, cRequest.StartDate, cRequest.EndDate)
+	if err != nil {
+		http.Error(w, "Failed to get data from InfluxDB", http.StatusInternalServerError)
+		utils.Logger.Printf("Failed to get data from InfluxDB: %v", err)
+		return
+	}
+
+	// Map rows to JSON and write to response
+	jsonResults, err := json.Marshal(results)
+	if err != nil {
+		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
+		utils.Logger.Printf("Failed to marshal JSON: %v", err)
+		return
+	}
+
+	w.Write(jsonResults)
+
+	utils.Logger.Printf("Data retrieved from InfluxDB for user: %d", user.UserID)
+}
