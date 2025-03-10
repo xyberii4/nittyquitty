@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
@@ -8,11 +9,12 @@ import (
 
 // Struct for each time the user consumes nicotine
 type NicotineConsumption struct {
-	Product  string  `json:"product"`  // Vape/Cigarette/Snus/etc
-	UserID   string  `json:"userID"`   // Same as MySQL
-	Mg       float64 `json:"mg"`       // Nicotine amount in mg
-	Quantity int     `json:"quantity"` // Quantity consumed
-	Cost     float64 `json:"cost"`     // Cost of the product
+	Product   string    `json:"product"`   // Vape/Cigarette/Snus/etc
+	UserID    int       `json:"user_id"`   // Same as MySQL
+	Mg        float64   `json:"mg"`        // Nicotine amount in mg
+	Quantity  int       `json:"quantity"`  // Quantity consumed
+	Cost      float64   `json:"cost"`      // Cost of the product
+	Timestamp time.Time `json:"timestamp"` // Time of consumption
 }
 
 // ConsumptionRequest struct with JSON tags
@@ -41,7 +43,7 @@ type UserData struct {
 func (n *NicotineConsumption) ToInfluxPoint() *write.Point {
 	return write.NewPoint(
 		"nicotine_consumption",
-		map[string]string{"product": n.Product, "user_id": n.UserID},
+		map[string]string{"product": n.Product, "user_id": strconv.Itoa(n.UserID)},
 		map[string]interface{}{"mg": n.Mg, "quantity": n.Quantity, "cost": n.Cost},
 		time.Now(),
 	)
