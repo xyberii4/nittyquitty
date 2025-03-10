@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/nittyquitty/internal/config"
@@ -78,17 +79,46 @@ func (c *InfluxdbClient) GetUserData(user models.UserData, start, end string) ([
 	var rows []models.NicotineConsumption
 
 	for result.Next() {
-		row := models.NicotineConsumption{
-			Product: result.Record().ValueByKey("product").(string),
-			UserID:  result.Record().ValueByKey("user_id").(string),
+		record := result.Record()
+
+		// Ensure userID is of type int
+		var userID int
+		if userIDValue := record.ValueByKey("user_id"); userIDValue != nil {
+			switch v := userIDValue.(type) {
+			case string:
+				// If user_id is a string, try to parse it as an int
+				parsedID, err := strconv.Atoi(v)
+				if err != nil {
+					utils.Logger.Printf("Warning: Unable to parse user_id as int: %s\n", v)
+					continue
+				}
+				userID = parsedID
+			case int:
+				// If user_id is already an int, use it directly
+				userID = v
+			case float64:
+				// If user_id is a float, convert it to int
+				userID = int(v)
+			default:
+				utils.Logger.Printf("Warning: Unexpected type for user_id: %T\n", v)
+				continue
+			}
 		}
-		switch result.Record().Field() {
+
+		// Create row
+		row := models.NicotineConsumption{
+			Product:   record.ValueByKey("product").(string),
+			UserID:    userID,
+			Timestamp: record.Time(),
+		}
+		// Add all fields to row stuct
+		switch record.Field() {
 		case "mg":
-			row.Mg = result.Record().Value().(float64)
+			row.Mg = record.Value().(float64)
 		case "quantity":
-			row.Quantity = int(result.Record().Value().(int64))
+			row.Quantity = int(record.Value().(int64))
 		case "cost":
-			row.Cost = result.Record().Value().(float64)
+			row.Cost = record.Value().(float64)
 		}
 
 		rows = append(rows, row)

@@ -12,7 +12,7 @@ import (
 func TestInfluxDBWrite(t *testing.T) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	testData := models.NicotineConsumption{
-		UserID:   "123",
+		UserID:   123,
 		Product:  "test",
 		Mg:       r.Float64(),
 		Quantity: r.Intn(10),
