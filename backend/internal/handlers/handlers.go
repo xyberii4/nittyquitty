@@ -29,7 +29,7 @@ func (h *Handler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 // Adds users' nicotine usage to InfluxDB
-func (h *Handler) LogNicUsage(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) LogConsumption(w http.ResponseWriter, r *http.Request) {
 	utils.Logger.Println("/api/logUsage endpoint hit")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -73,7 +73,7 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // Get user consumption data for given userID
-func (h *Handler) GetUserConsumption(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetConsumption(w http.ResponseWriter, r *http.Request) {
 	utils.Logger.Println("/api/getUserConsumption endpoint hit")
 
 	// Map request body to struct
