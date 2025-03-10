@@ -62,6 +62,26 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate required fields
+	if user.Username == "" || user.Password == "" {
+		http.Error(w, "Username and password are required", http.StatusBadRequest)
+		return
+	}
+
+	// Validate weekly usage and strength for selected products
+	if user.Snus && (user.SnusWeeklyUsage <= 0 || user.SnusStrength <= 0) {
+		http.Error(w, "Invalid snus usage data", http.StatusBadRequest)
+		return
+	}
+	if user.Vape && (user.VapeWeeklyUsage <= 0 || user.VapeStrength <= 0) {
+		http.Error(w, "Invalid vape usage data", http.StatusBadRequest)
+		return
+	}
+	if user.Cigarette && user.CigWeeklyUsage <= 0 {
+		http.Error(w, "Invalid cigarette usage data", http.StatusBadRequest)
+		return
+	}
+
 	// Write to MySQL
 	if err := h.MySQLClient.AddUser(user); err != nil {
 		http.Error(w, "Failed to write data to MySQL", http.StatusInternalServerError)
@@ -70,6 +90,7 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.Logger.Println("Data written to MySQL")
+	w.WriteHeader(http.StatusOK)
 }
 
 // Get user consumption data for given userID
