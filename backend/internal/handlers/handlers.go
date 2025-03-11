@@ -29,7 +29,7 @@ func (h *Handler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 // Adds users' nicotine usage to InfluxDB
-func (h *Handler) LogNicUsage(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) LogConsumption(w http.ResponseWriter, r *http.Request) {
 	utils.Logger.Println("/api/logUsage endpoint hit")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -48,4 +48,84 @@ func (h *Handler) LogNicUsage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.Logger.Println("Data written to InfluxDB") // include username asw
+}
+
+// Add new user to MySQL
+func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
+	utils.Logger.Println("/api/addUser endpoint hit")
+	w.Header().Set("Content-Type", "application/json")
+
+	// Check if request body matches expected struct
+	var user models.UserData
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	// Validate required fields
+	if user.Username == "" || user.Password == "" {
+		http.Error(w, "Username and password are required", http.StatusBadRequest)
+		return
+	}
+
+	// Validate weekly usage and strength for selected products
+	if user.Snus && (user.SnusWeeklyUsage <= 0 || user.SnusStrength <= 0) {
+		http.Error(w, "Invalid snus usage data", http.StatusBadRequest)
+		return
+	}
+	if user.Vape && (user.VapeWeeklyUsage <= 0 || user.VapeStrength <= 0) {
+		http.Error(w, "Invalid vape usage data", http.StatusBadRequest)
+		return
+	}
+	if user.Cigarette && user.CigWeeklyUsage <= 0 {
+		http.Error(w, "Invalid cigarette usage data", http.StatusBadRequest)
+		return
+	}
+
+	// Write to MySQL
+	if err := h.MySQLClient.AddUser(user); err != nil {
+		http.Error(w, "Failed to write data to MySQL", http.StatusInternalServerError)
+		utils.Logger.Printf("Failed to write data to MySQL: %v", err)
+		return
+	}
+
+	utils.Logger.Println("Data written to MySQL")
+	w.WriteHeader(http.StatusOK)
+}
+
+// Get user consumption data for given userID
+func (h *Handler) GetConsumption(w http.ResponseWriter, r *http.Request) {
+	utils.Logger.Println("/api/getUserConsumption endpoint hit")
+
+	// Map request body to struct
+	var cRequest models.ConsumptionRequest
+	err := json.NewDecoder(r.Body).Decode(&cRequest)
+	if err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	user := models.UserData{
+		UserID: int(cRequest.UserID),
+	}
+
+	// Retrieve rows from InfluxDB
+	results, err := h.InfluxDBClient.GetUserData(user, cRequest.StartDate, cRequest.EndDate)
+	if err != nil {
+		http.Error(w, "Failed to get data from InfluxDB", http.StatusInternalServerError)
+		utils.Logger.Printf("Failed to get data from InfluxDB: %v", err)
+		return
+	}
+
+	// Map rows to JSON and write to response
+	jsonResults, err := json.Marshal(results)
+	if err != nil {
+		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
+		utils.Logger.Printf("Failed to marshal JSON: %v", err)
+		return
+	}
+
+	w.Write(jsonResults)
+
+	utils.Logger.Printf("Data retrieved from InfluxDB for user: %d", user.UserID)
 }
