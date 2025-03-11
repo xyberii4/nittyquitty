@@ -3,8 +3,11 @@ import 'savings_screen.dart';
 import 'input_nic_screen.dart';
 import 'analytics_screen.dart';
 import 'community_screen.dart';
-// Home Screen with Bottom Navigation
+import 'settingspage.dart'; // Import the new Settings screen
+
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -33,6 +36,17 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.green,
         title: const Text("NicQuit"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings), // 🔹 Settings Icon
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -64,6 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class MainHomeScreen extends StatelessWidget {
+  const MainHomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Text('Home Page', style: TextStyle(fontSize: 24, color: Colors.white));
