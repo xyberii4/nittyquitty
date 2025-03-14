@@ -72,7 +72,7 @@ func (c *MySQLClient) Close() {
 
 // Add user to MySQL
 func (c *MySQLClient) AddUser(n models.UserData) error {
-	// Check for dupe
+	// Check for duplicate username
 	var existingUserID int
 	err := c.client.QueryRow("SELECT UserID FROM Users WHERE Username = ?", n.Username).Scan(&existingUserID)
 	if err != nil && err != sql.ErrNoRows {
@@ -84,15 +84,33 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 		return fmt.Errorf("username already exists: %s", n.Username)
 	}
 
-	// Prep statement
-	stmt, err := c.client.Prepare(fmt.Sprintf("INSERT INTO Users (UserID, Username, Password, Snus, SnusWeeklyUsage, SnusStrength, Vape, VapeWeeklyUsage, VapeStrength, Cigarette, CigWeeklyUsage) VALUES (%d, %s, %s, %t, %d, %d, %t, %d, %d, %t, %d)", n.UserID, n.Username, n.Password, n.Snus, n.SnusWeeklyUsage, n.SnusStrength, n.Vape, n.VapeWeeklyUsage, n.VapeStrength, n.Cigarette, n.CigWeeklyUsage))
+	// Prepare the INSERT statement
+	query := `
+		INSERT INTO Users 
+		(Username, Password, Snus, SnusWeeklyUsage, SnusStrength, Vape, VapeWeeklyUsage, VapeStrength, Cigarette, CigWeeklyUsage) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`
+	stmt, err := c.client.Prepare(query)
 	if err != nil {
 		utils.Logger.Printf("Failed to prepare statement: %v", err)
 		return fmt.Errorf("failed to prepare statement: %v", err)
 	}
+	defer stmt.Close()
 
-	// Exec statement
-	if _, err := stmt.Exec(n); err != nil {
+	// Execute the statement with user data
+	_, err = stmt.Exec(
+		n.Username,
+		n.Password,
+		n.Snus,
+		n.SnusWeeklyUsage,
+		n.SnusStrength,
+		n.Vape,
+		n.VapeWeeklyUsage,
+		n.VapeStrength,
+		n.Cigarette,
+		n.CigWeeklyUsage,
+	)
+	if err != nil {
 		utils.Logger.Printf("Failed to execute statement: %v", err)
 		return fmt.Errorf("failed to execute statement: %v", err)
 	}
@@ -103,16 +121,35 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 
 // Retrieves user from MySQL
 func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
-	// Prep statement
-	stmt, err := c.client.Prepare(fmt.Sprintf("SELECT * FROM Users WHERE UserID = %d", userID))
+	// Prepare the SELECT statement
+	query := "SELECT * FROM Users WHERE UserID = ?"
+	stmt, err := c.client.Prepare(query)
 	if err != nil {
 		utils.Logger.Printf("Failed to prepare statement: %v", err)
 		return models.UserData{}, fmt.Errorf("failed to prepare statement: %v", err)
 	}
+	defer stmt.Close()
 
-	// Exec statement
+	// Execute the query and scan the result into the UserData struct
 	var user models.UserData
-	if err := stmt.QueryRow(userID).Scan(&user); err != nil {
+	err = stmt.QueryRow(userID).Scan(
+		&user.UserID,
+		&user.Username,
+		&user.Password,
+		&user.Snus,
+		&user.SnusWeeklyUsage,
+		&user.SnusStrength,
+		&user.Vape,
+		&user.VapeWeeklyUsage,
+		&user.VapeStrength,
+		&user.Cigarette,
+		&user.CigWeeklyUsage,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			utils.Logger.Printf("User not found: %d", userID)
+			return models.UserData{}, fmt.Errorf("user not found: %d", userID)
+		}
 		utils.Logger.Printf("Failed to execute statement: %v", err)
 		return models.UserData{}, fmt.Errorf("failed to execute statement: %v", err)
 	}
