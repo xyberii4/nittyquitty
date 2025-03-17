@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart'; // Import your Home Screen
+import 'signup_screen.dart'; // Import the Sign Up Screen
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -117,6 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextButton(
                       onPressed: () {
                         // Navigate to Sign Up Page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUpScreen()),
+                        );
                       },
                       child: Text("Sign Up"),
                     ),
