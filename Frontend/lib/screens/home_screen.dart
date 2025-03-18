@@ -35,7 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: const Text("NicQuit"),
+        title: Image.asset('images/Logo.png',
+        height: 60, // Adjust height as needed
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings), // 🔹 Settings Icon

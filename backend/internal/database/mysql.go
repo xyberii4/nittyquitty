@@ -14,7 +14,7 @@ type MySQLClient struct {
 	client *sql.DB
 }
 
-//Create User table if it does not exist
+// Create User table if it does not exist
 func createTable(db *sql.DB) error {
 	query := `
     CREATE TABLE IF NOT EXISTS Users (
@@ -27,7 +27,7 @@ func createTable(db *sql.DB) error {
         Vape TINYINT(1) NOT NULL,
         VapeWeeklyUsage INT NOT NULL,
         VapeStrength INT NOT NULL,
-        Cigarettes TINYINT(1) NOT NULL,
+        Cigarette TINYINT(1) NOT NULL,
         CigWeeklyUsage INT NOT NULL,
         PRIMARY KEY (UserID)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -40,21 +40,21 @@ func createTable(db *sql.DB) error {
 	return nil
 }
 
-//Create a new MySQL client
+// Create a new MySQL client
 func NewMySQLClient(cfg config.MySQLConfig) (*MySQLClient, error) {
 	sql_connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
-	//Conn to database
+	// Conn to database
 	database, err := sql.Open("mysql", sql_connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to MySQL: %w", err)
 	}
 
-	//Check conn
+	// Check conn
 	if err := database.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping MySQL: %w", err)
 	}
 
-	//Create the Users table
+	// Create the Users table
 	if err := createTable(database); err != nil {
 		return nil, fmt.Errorf("failed to create table: %w", err)
 	}
@@ -64,15 +64,15 @@ func NewMySQLClient(cfg config.MySQLConfig) (*MySQLClient, error) {
 	}, nil
 }
 
-//Close the MySQL client
+// Close the MySQL client
 func (c *MySQLClient) Close() {
 	c.client.Close()
 	utils.Logger.Println("MySQL client closed")
 }
 
-//Add user to MySQL
+// Add user to MySQL
 func (c *MySQLClient) AddUser(n models.UserData) error {
-	//Check for dupe
+	// Check for duplicate username
 	var existingUserID int
 	err := c.client.QueryRow("SELECT UserID FROM Users WHERE Username = ?", n.Username).Scan(&existingUserID)
 	if err != nil && err != sql.ErrNoRows {
@@ -84,15 +84,33 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 		return fmt.Errorf("username already exists: %s", n.Username)
 	}
 
-	//Prep statement
-	stmt, err := c.client.Prepare(fmt.Sprintf("INSERT INTO Users (UserID, Username, Password, Snus, SnusWeeklyUsage, SnusStrength, Vape, VapeWeeklyUsage, VapeStrength, Cigarette, CigWeeklyUsage) VALUES (%d, %s, %s, %t, %d, %d, %t, %d, %d, %t, %d)", n.UserID, n.Username, n.Password, n.Snus, n.SnusWeeklyUsage, n.SnusStrength, n.Vape, n.VapeWeeklyUsage, n.VapeStrength, n.Cigarette, n.CigWeeklyUsage))
+	// Prepare the INSERT statement
+	query := `
+		INSERT INTO Users 
+		(Username, Password, Snus, SnusWeeklyUsage, SnusStrength, Vape, VapeWeeklyUsage, VapeStrength, Cigarette, CigWeeklyUsage) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`
+	stmt, err := c.client.Prepare(query)
 	if err != nil {
 		utils.Logger.Printf("Failed to prepare statement: %v", err)
 		return fmt.Errorf("failed to prepare statement: %v", err)
 	}
+	defer stmt.Close()
 
-	//Exec statement
-	if _, err := stmt.Exec(n); err != nil {
+	// Execute the statement with user data
+	_, err = stmt.Exec(
+		n.Username,
+		n.Password,
+		n.Snus,
+		n.SnusWeeklyUsage,
+		n.SnusStrength,
+		n.Vape,
+		n.VapeWeeklyUsage,
+		n.VapeStrength,
+		n.Cigarette,
+		n.CigWeeklyUsage,
+	)
+	if err != nil {
 		utils.Logger.Printf("Failed to execute statement: %v", err)
 		return fmt.Errorf("failed to execute statement: %v", err)
 	}
@@ -103,17 +121,35 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 
 // Retrieves user from MySQL
 func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
-
-	//Prep statement
-	stmt, err := c.client.Prepare(fmt.Sprintf("SELECT * FROM Users WHERE UserID = %d", userID))
+	// Prepare the SELECT statement
+	query := "SELECT * FROM Users WHERE UserID = ?"
+	stmt, err := c.client.Prepare(query)
 	if err != nil {
 		utils.Logger.Printf("Failed to prepare statement: %v", err)
 		return models.UserData{}, fmt.Errorf("failed to prepare statement: %v", err)
 	}
+	defer stmt.Close()
 
-	//Exec statement
+	// Execute the query and scan the result into the UserData struct
 	var user models.UserData
-	if err := stmt.QueryRow(userID).Scan(&user); err != nil {
+	err = stmt.QueryRow(userID).Scan(
+		&user.UserID,
+		&user.Username,
+		&user.Password,
+		&user.Snus,
+		&user.SnusWeeklyUsage,
+		&user.SnusStrength,
+		&user.Vape,
+		&user.VapeWeeklyUsage,
+		&user.VapeStrength,
+		&user.Cigarette,
+		&user.CigWeeklyUsage,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			utils.Logger.Printf("User not found: %d", userID)
+			return models.UserData{}, fmt.Errorf("user not found: %d", userID)
+		}
 		utils.Logger.Printf("Failed to execute statement: %v", err)
 		return models.UserData{}, fmt.Errorf("failed to execute statement: %v", err)
 	}
