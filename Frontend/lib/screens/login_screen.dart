@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart'; // Import your Home Screen
-import 'signup_screen.dart'; // Import the Sign Up Screen
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'home_screen.dart';
+import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -8,33 +10,63 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>(); // Form key for validation
-  final TextEditingController _emailController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isPasswordVisible = false; // Toggle password visibility
+  bool _isPasswordVisible = false;
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      // Show a loading snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Logging in...')),
-      );
+  Future<void> _login() async {
+  if (!_formKey.currentState!.validate()) return;
 
-      // Simulate login delay
-      Future.delayed(Duration(seconds: 2), () {
-        // Navigate to Home Screen and remove Login Page from stack
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      });
-    }
-  }
+  // Simulating a delay to mimic a real API call (optional)
+  await Future.delayed(Duration(seconds: 1));
 
-  @override
+  // Navigate to HomeScreen regardless of login status
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => HomeScreen()),
+  );
+  //Database call waiting on API to be implemented 
+  // final url = Uri.parse("http://34.105.133.181:8080/user/login"); 
+
+  // try {
+  //   final response = await http.post(
+  //     url,
+  //     headers: {"Content-Type": "application/json"},
+  //     body: jsonEncode({
+  //       "username": _usernameController.text, 
+  //       "password": _passwordController.text,
+  //     }),
+  //   );
+
+  //   print("Response Status Code: ${response.statusCode}");
+  //   print("Response Body: ${response.body}"); // Print the response for debugging
+
+  //   if (response.statusCode == 200) {
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => HomeScreen()),
+  //     );
+  //   } else {
+  //     final responseData = jsonDecode(response.body);
+  //     String errorMessage = responseData["error"] ?? "Login failed. Check credentials.";
+      
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(errorMessage)),
+  //     );
+  //   }
+  // } catch (e) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content: Text("Error connecting to server.")),
+  //   );
+  // }
+}
+
+
+  @override 
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green.shade100, // Light background color
+      backgroundColor: Colors.green.shade100,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -43,28 +75,25 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // App Logo or Title
                 Text(
                   "NicQuit Login",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 24),
 
-                // Email Input Field
+                // Username Input Field (Fixed)
                 TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
+                  controller: _usernameController, 
                   decoration: InputDecoration(
-                    labelText: "Email",
+                    labelText: "Username",
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
+                    prefixIcon: Icon(Icons.person),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter your email";
-                    } else if (!RegExp(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
-                        .hasMatch(value)) {
-                      return "Enter a valid email";
+                      return "Please enter your username";
+                    } else if (value.length < 3) {
+                      return "Username must be at least 3 characters";
                     }
                     return null;
                   },
@@ -117,7 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     TextButton(
                       onPressed: () {
-                        // Navigate to Sign Up Page
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => SignUpScreen()),
