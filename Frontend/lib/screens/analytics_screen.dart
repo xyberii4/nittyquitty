@@ -131,17 +131,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // --- 1) TOGGLE for Period ---
               _buildPeriodToggle(),
-
-              // --- 2) TOGGLE for Data Type ---
               _buildDataTypeToggle(),
 
               const SizedBox(height: 16),
 
               // --- BAR CHART ONLY ---
               Card(
-                color: Colors.white70,
+                color: Colors.white,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: SizedBox(
@@ -184,13 +181,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      /*bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Input Nic'),
           BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Analytics'),
         ],
-      ),
+      ),*/
     );
   }
 
@@ -199,6 +196,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+      Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child:
         ToggleButtons(
           isSelected: [
             _selectedPeriod == Period.day,
@@ -212,6 +213,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             });
             _fetchChartData();
           },
+          renderBorder: false,
+          fillColor: Colors.green,
           children: const [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
@@ -222,16 +225,16 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               child: Text('Week'),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text('Month'),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text('Year'),
             ),
           ],
         ),
-      ],
+      )],
     );
   }
 
@@ -240,6 +243,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+      Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child:
         ToggleButtons(
           isSelected: [
             _selectedDataType == DataType.nicotine,
@@ -251,6 +258,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             });
             _fetchChartData();
           },
+          fillColor: Colors.green,
           children: const [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
@@ -262,7 +270,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             ),
           ],
         ),
-      ],
+      )],
     );
   }
 
