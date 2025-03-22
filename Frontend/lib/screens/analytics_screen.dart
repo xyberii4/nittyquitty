@@ -81,7 +81,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
       // For "day" -> 24 hours
         _barData = List.generate(24, (i) => (math.Random().nextDouble() * 10).roundToDouble());
-        _xLabels = List.generate(24, (i) => i.toString()); // "0", "1", ..., "23"
+        //_xLabels = List.generate(24, (i) => i.toString()); // "0", "1", ..., "23"
+        _xLabels = [];
         break;
 
       case Period.week:
@@ -93,7 +94,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       case Period.month:
       // For "month" -> ~30 days
         _barData = List.generate(30, (i) => (math.Random().nextDouble() * 25).roundToDouble());
-        _xLabels = List.generate(30, (i) => (i + 1).toString());
+        //_xLabels = List.generate(30, (i) => (i + 1).toString());
+        _xLabels = [];
         break;
 
       case Period.year:
@@ -156,18 +158,43 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                 if (index < 0 || index >= _xLabels.length) {
                                   return const SizedBox.shrink();
                                 }
-                                return Text(
-                                  _xLabels[index],
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),  // Add horizontal padding
+                                  child: Text(
+                                    _xLabels[index],
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11,
+                                    ),
                                   ),
                                 );
                               },
                             ),
                           ),
                           leftTitles: AxisTitles(
-                            sideTitles: SideTitles(showTitles: true),
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) {
+                                final maxY = meta.max;
+                                final minY = meta.min;
+
+                                // Calculate the step size for the Y-axis labels
+                                final step = (maxY - minY) / 5;  // Divide the range into 5 steps (adjust as needed)
+
+                                final label = (value * step).toStringAsFixed(0);  // Calculate the Y-axis label
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0), // Add padding
+                                  child: Text(
+                                    label,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                           topTitles: AxisTitles(
                             sideTitles: SideTitles(showTitles: false),
@@ -187,13 +214,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           ),
         ),
       ),
-      /*bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Input Nic'),
-          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Analytics'),
-        ],
-      ),*/
     );
   }
 
