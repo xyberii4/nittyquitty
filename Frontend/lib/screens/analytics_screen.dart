@@ -160,7 +160,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                   _xLabels[index],
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                                    fontSize: 11,
                                   ),
                                 );
                               },
@@ -168,6 +168,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           ),
                           leftTitles: AxisTitles(
                             sideTitles: SideTitles(showTitles: true),
+                          ),
+                          topTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          rightTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
                           ),
                         ),
                         borderData: FlBorderData(show: false),
