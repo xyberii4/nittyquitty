@@ -8,8 +8,10 @@ import (
 
 func TestAddUser(t *testing.T) {
 	testUser := models.UserData{
-		Username: "h",
-		Password: "abcd",
+		Username:     "h",
+		Password:     "abcd",
+		Goal:         1,
+		GoalDeadline: "2024-10-31",
 	}
 
 	if err := mysqlClient.AddUser(testUser); err != nil {
