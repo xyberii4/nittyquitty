@@ -26,19 +26,19 @@ type ConsumptionRequest struct {
 
 // User struct with JSON tags
 type UserData struct {
-	UserID          int       `json:"user_id"`
-	Username        string    `json:"username"`
-	Password        string    `json:"password"`
-	Snus            bool      `json:"snus"`
-	SnusWeeklyUsage int       `json:"snus_weekly_usage"`
-	SnusStrength    int       `json:"snus_strength"`
-	Vape            bool      `json:"vape"`
-	VapeWeeklyUsage int       `json:"vape_weekly_usage"`
-	VapeStrength    int       `json:"vape_strength"`
-	Cigarette       bool      `json:"cigarette"`
-	CigWeeklyUsage  int       `json:"cig_weekly_usage"`
-	Goal            float64   `json:"goal"`
-	GoalDeadline    time.Time `json:"goal_deadline"`
+	UserID          int     `json:"user_id"`
+	Username        string  `json:"username"`
+	Password        string  `json:"password"`
+	Snus            bool    `json:"snus"`
+	SnusWeeklyUsage int     `json:"snus_weekly_usage"`
+	SnusStrength    int     `json:"snus_strength"`
+	Vape            bool    `json:"vape"`
+	VapeWeeklyUsage int     `json:"vape_weekly_usage"`
+	VapeStrength    int     `json:"vape_strength"`
+	Cigarette       bool    `json:"cigarette"`
+	CigWeeklyUsage  int     `json:"cig_weekly_usage"`
+	Goal            float64 `json:"goal"`
+	GoalDeadline    string  `json:"goal_deadline"`
 }
 
 // Converts NicotineConsumption to InfluxDB point

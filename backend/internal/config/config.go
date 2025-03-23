@@ -28,6 +28,7 @@ type Config struct {
 	MySQL    MySQLConfig
 }
 
+// Load env variables
 func Load() (*Config, error) {
 	if err := godotenv.Load(); err != nil {
 		return nil, fmt.Errorf("Error loading .env file: %v", err)

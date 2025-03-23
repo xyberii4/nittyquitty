@@ -78,14 +78,12 @@ func (c *MySQLClient) Close() {
 // Add user to MySQL
 func (c *MySQLClient) AddUser(n models.UserData) error {
 	// Check for duplicate username
-	var existingUserID int
-	err := c.client.QueryRow("SELECT UserID FROM Users WHERE Username = ?", n.Username).Scan(&existingUserID)
+	var existingUsername int
+	err := c.client.QueryRow("SELECT UserID FROM Users WHERE Username = ?", n.Username).Scan(&existingUsername)
 	if err != nil && err != sql.ErrNoRows {
-		utils.Logger.Printf("Failed to check for duplicate username: %v", err)
 		return fmt.Errorf("failed to check for duplicate username: %v", err)
 	}
-	if existingUserID != 0 {
-		utils.Logger.Printf("Username already exists: %s", n.Username)
+	if existingUsername != 0 {
 		return fmt.Errorf("username already exists: %s", n.Username)
 	}
 
@@ -97,7 +95,6 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 	`
 	stmt, err := c.client.Prepare(query)
 	if err != nil {
-		utils.Logger.Printf("Failed to prepare statement: %v", err)
 		return fmt.Errorf("failed to prepare statement: %v", err)
 	}
 	defer stmt.Close()
@@ -118,11 +115,9 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 		n.GoalDeadline,
 	)
 	if err != nil {
-		utils.Logger.Printf("Failed to execute statement: %v", err)
 		return fmt.Errorf("failed to execute statement: %v", err)
 	}
 
-	utils.Logger.Printf("User added to MySQL: %v", n)
 	return nil
 }
 
@@ -132,7 +127,6 @@ func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
 	query := "SELECT * FROM Users WHERE UserID = ?"
 	stmt, err := c.client.Prepare(query)
 	if err != nil {
-		utils.Logger.Printf("Failed to prepare statement: %v", err)
 		return models.UserData{}, fmt.Errorf("failed to prepare statement: %v", err)
 	}
 	defer stmt.Close()
@@ -156,14 +150,11 @@ func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			utils.Logger.Printf("User not found: %d", userID)
 			return models.UserData{}, fmt.Errorf("user not found: %d", userID)
 		}
-		utils.Logger.Printf("Failed to execute statement: %v", err)
 		return models.UserData{}, fmt.Errorf("failed to execute statement: %v", err)
 	}
 
-	utils.Logger.Printf("User retrieved from MySQL: %v", user)
 	return user, nil
 }
 

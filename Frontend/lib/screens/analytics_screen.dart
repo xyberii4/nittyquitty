@@ -25,11 +25,9 @@ class AnalyticsScreen extends StatefulWidget {
 }
 
 class _AnalyticsScreenState extends State<AnalyticsScreen> {
-  // 2. Track selected toggles
   Period _selectedPeriod = Period.day;
   DataType _selectedDataType = DataType.nicotine;
 
-  // 3. Bar chart data placeholders
   List<double> _barData = [];
   List<String> _xLabels = [];
 
@@ -42,17 +40,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     _fetchChartData();
   }
 
-  /// Fetch data based on the current toggles.
-  /// In a real app, call your DB or API here to get actual data.
   Future<void> _fetchChartData() async {
-    // Clear old data
     _barData = [];
     _xLabels = [];
 
+    /*
     String apiBaseURL = "http://34.105.133.181:8080";
     final now = DateTime.now();
     final nowUTC = now.toUtc();
+    */
 
+
+    // currently just random data, but need to connect to database
     switch (_selectedPeriod) {
       case Period.day:
       /*
@@ -156,7 +155,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     child: BarChart(
                       BarChartData(
                         minY: 0,
-                        maxY: barMax + 5, // add some padding on top
+                        maxY: barMax + 5,
+                        
                         titlesData: FlTitlesData(
                           bottomTitles: AxisTitles(
                             sideTitles: SideTitles(
