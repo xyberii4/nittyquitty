@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/nittyquitty/internal/database"
@@ -52,7 +53,7 @@ func (h *Handler) LogConsumption(w http.ResponseWriter, r *http.Request) {
 
 // Add new user to MySQL
 func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
-	utils.Logger.Println("/api/addUser endpoint hit")
+	utils.Logger.Println("/user/addUser endpoint hit")
 	w.Header().Set("Content-Type", "application/json")
 
 	// Check if request body matches expected struct
@@ -91,6 +92,37 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 
 	utils.Logger.Println("Data written to MySQL")
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
+	utils.Logger.Println("/user/login endpoint hit")
+	w.Header().Set("Content-Type", "application/json")
+
+	// Map request body to struct
+	var userRequest models.UserData
+	if err := json.NewDecoder(r.Body).Decode(&userRequest); err != nil {
+		utils.Logger.Printf("Failed to decode JSON: %v", err)
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.MySQLClient.AuthenticateUser(userRequest)
+	if err != nil {
+		if errors.Is(err, database.ErrInvalidUser) {
+			utils.Logger.Printf("Login failed: %v", err)
+			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+			return
+		}
+		utils.Logger.Printf("Failed to authenticate user: %v", err)
+		http.Error(w, "Failed to authenticate user", http.StatusInternalServerError)
+		return
+	}
+
+	response, _ := json.Marshal(user)
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
+
+	utils.Logger.Printf("User %s authenticated", user.Username)
 }
 
 // Get user consumption data for given userID
