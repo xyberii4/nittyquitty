@@ -15,5 +15,6 @@ func Setup(ic *database.InfluxdbClient, mc *database.MySQLClient) chi.Router {
 	r.Post("/api/logConsumption", handler.LogConsumption)
 	r.Get("/api/getConsumption", handler.GetConsumption)
 	r.Post("/user/signup", handler.AddUser)
+	r.Post("/user/login", handler.Login)
 	return r
 }
