@@ -29,6 +29,8 @@ func createTable(db *sql.DB) error {
         VapeStrength INT NOT NULL,
         Cigarette TINYINT(1) NOT NULL,
         CigWeeklyUsage INT NOT NULL,
+        Goal INT NOT NULL,
+        GoalDeadline DATE NOT NULL,
         PRIMARY KEY (UserID)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
     `
