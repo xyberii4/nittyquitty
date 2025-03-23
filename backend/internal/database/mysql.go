@@ -92,8 +92,8 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 	// Prepare the INSERT statement
 	query := `
 		INSERT INTO Users 
-		(Username, Password, Snus, SnusWeeklyUsage, SnusStrength, Vape, VapeWeeklyUsage, VapeStrength, Cigarette, CigWeeklyUsage) 
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		(Username, Password, Snus, SnusWeeklyUsage, SnusStrength, Vape, VapeWeeklyUsage, VapeStrength, Cigarette, CigWeeklyUsage, Goal, GoalDeadline)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
 	stmt, err := c.client.Prepare(query)
 	if err != nil {
@@ -114,6 +114,8 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 		n.VapeStrength,
 		n.Cigarette,
 		n.CigWeeklyUsage,
+		n.Goal,
+		n.GoalDeadline,
 	)
 	if err != nil {
 		utils.Logger.Printf("Failed to execute statement: %v", err)
@@ -149,6 +151,8 @@ func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
 		&user.VapeStrength,
 		&user.Cigarette,
 		&user.CigWeeklyUsage,
+		&user.Goal,
+		&user.GoalDeadline,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
