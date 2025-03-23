@@ -1,11 +1,8 @@
-name: flutter_application_1
+name: notifications
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
-
-
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -33,18 +30,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences: ^2.2.2  # (or latest version)
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.1
+  intl: ^0.18.0
+  http: ^1.3.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  http: ^1.3.0
-  fl_chart: ^0.70.2
-  intl: ^0.20.2
-<<<<<<< HEAD
-=======
-
->>>>>>> 73787e6d22a350d7387533016b21f0241d61531f
 
 dev_dependencies:
   flutter_test:
@@ -69,10 +62,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-      - images/Tree.jpg
-      - images/Logo.png
-      
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
