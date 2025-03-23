@@ -41,10 +41,6 @@ dependencies:
   http: ^1.3.0
   fl_chart: ^0.70.2
   intl: ^0.20.2
-<<<<<<< HEAD
-=======
-
->>>>>>> 73787e6d22a350d7387533016b21f0241d61531f
 
 dev_dependencies:
   flutter_test:
