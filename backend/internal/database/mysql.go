@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,6 +14,8 @@ import (
 type MySQLClient struct {
 	client *sql.DB
 }
+
+var ErrInvalidUser = errors.New("invalid user")
 
 // Create User table if it does not exist
 func createTable(db *sql.DB) error {
@@ -157,5 +160,27 @@ func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
 	}
 
 	utils.Logger.Printf("User retrieved from MySQL: %v", user)
+	return user, nil
+}
+
+func (c *MySQLClient) AuthenticateUser(user models.UserData) (models.UserData, error) {
+	// Prepare query
+	query := "SELECT UserID FROM Users WHERE Username = ? AND Password = ?"
+	stmt, err := c.client.Prepare(query)
+	if err != nil {
+		return models.UserData{}, fmt.Errorf("failed to prepare statement: %w", err)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(user.Username, user.Password).Scan(&user.UserID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.UserData{}, ErrInvalidUser
+		}
+		return models.UserData{}, fmt.Errorf("failed to execute statement: %w", err)
+	}
+	user.Password = ""
+	// Only returns userID
 	return user, nil
 }
