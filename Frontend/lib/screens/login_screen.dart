@@ -39,10 +39,15 @@ class _LoginScreenState extends State<LoginScreen> {
   //     }),
   //   );
 
-  //   print("Response Status Code: ${response.statusCode}");
-  //   print("Response Body: ${response.body}"); // Print the response for debugging
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   await prefs.setInt("user_id", userId);
 
   //   if (response.statusCode == 200) {
+
+  //     final responseData = jsonDecode(response.body);
+  //     int userId = responseData["user_id"]; // Extract user_id
+
+  //     //Pass userId to HomeScreen      
   //     Navigator.pushReplacement(
   //       context,
   //       MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -81,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 24),
 
-                // Username Input Field (Fixed)
+                // Username Input Field 
                 TextFormField(
                   controller: _usernameController, 
                   decoration: InputDecoration(

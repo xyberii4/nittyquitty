@@ -15,6 +15,7 @@ class InputNicScreen extends StatelessWidget {
         title: Text("Input Nic"),
         backgroundColor: Colors.transparent, // 🔹 Makes AppBar transparent
         elevation: 0, // 🔹 Removes shadow
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [
