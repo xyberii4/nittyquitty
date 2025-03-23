@@ -24,12 +24,10 @@ func NewInfluxDBClient(cfg config.InfluxDBConfig) (*InfluxdbClient, error) {
 	// Check client health
 	health, err := client.Health(context.Background())
 	if err != nil {
-		utils.Logger.Printf("Failed to check InflixDB health: %v", err)
 		return nil, fmt.Errorf("failed to check InflixDB health: %v", err)
 	}
 
 	if health.Status != "pass" {
-		utils.Logger.Printf("InfluxDB health check failed: %v", health)
 		return nil, fmt.Errorf("influxDB health check failed: %v", health)
 	}
 
@@ -43,6 +41,7 @@ func NewInfluxDBClient(cfg config.InfluxDBConfig) (*InfluxdbClient, error) {
 // Closes the InfluxDB client
 func (c *InfluxdbClient) Close() {
 	c.client.Close()
+	utils.Logger.Println("InfluxDB client closed")
 }
 
 // Writes nicotine consumption data to InfluxDB
@@ -53,11 +52,9 @@ func (c *InfluxdbClient) WriteData(n models.NicotineConsumption) error {
 	point := n.ToInfluxPoint()
 
 	if err := writeAPI.WritePoint(context.Background(), point); err != nil {
-		utils.Logger.Printf("Failed to write data to InfluxDB: %v", err)
 		return fmt.Errorf("failed to write data to InfluxDB: %v", err)
 	}
 
-	utils.Logger.Printf("Data written to InfluxDB: %v", n)
 	return nil
 }
 
@@ -72,7 +69,6 @@ func (c *InfluxdbClient) GetUserData(user models.UserData, start, end string) ([
 
 	result, err := queryAPI.Query(context.Background(), query)
 	if err != nil {
-		utils.Logger.Printf("Failed to query InfluxDB: %v", err)
 		return nil, fmt.Errorf("failed to query InfluxDB: %v", err)
 	}
 

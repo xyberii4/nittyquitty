@@ -47,6 +47,6 @@ func (n *NicotineConsumption) ToInfluxPoint() *write.Point {
 		"nicotine_consumption",
 		map[string]string{"product": n.Product, "user_id": strconv.Itoa(n.UserID)},
 		map[string]interface{}{"mg": n.Mg, "quantity": n.Quantity, "cost": n.Cost},
-		n.Timestamp,
+		time.Now(),
 	)
 }

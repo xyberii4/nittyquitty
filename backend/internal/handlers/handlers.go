@@ -48,7 +48,7 @@ func (h *Handler) LogConsumption(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.Logger.Println("Data written to InfluxDB") // include username asw
+	utils.Logger.Printf("Consumption data for user %d logged.", usageRow.UserID)
 }
 
 // Add new user to MySQL
@@ -64,8 +64,8 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate required fields
-	if user.Username == "" || user.Password == "" {
-		http.Error(w, "Username and password are required", http.StatusBadRequest)
+	if user.Username == "" || user.Password == "" || user.Goal == 0 || user.GoalDeadline == "" {
+		http.Error(w, "Missing fields", http.StatusBadRequest)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.Logger.Println("Data written to MySQL")
+	utils.Logger.Printf("Data written to MySQL: New user: %s", user.Username)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -101,19 +101,19 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	// Map request body to struct
 	var userRequest models.UserData
 	if err := json.NewDecoder(r.Body).Decode(&userRequest); err != nil {
-		utils.Logger.Printf("Failed to decode JSON: %v", err)
 		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.MySQLClient.AuthenticateUser(userRequest)
 	if err != nil {
+		// If username or passwird is invalid, return 401
 		if errors.Is(err, database.ErrInvalidUser) {
 			utils.Logger.Printf("Login failed: %v", err)
 			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 			return
 		}
-		utils.Logger.Printf("Failed to authenticate user: %v", err)
+		utils.Logger.Printf("Failed to authenticate user %s: %v", user.Username, err)
 		http.Error(w, "Failed to authenticate user", http.StatusInternalServerError)
 		return
 	}
