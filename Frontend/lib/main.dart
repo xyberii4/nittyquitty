@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'screens/landing_screen.dart'; // Import the HomeScreen
 
-void main() {
-  runApp(MyApp());
+import 'package:flutter/material.dart';
+import 'noti_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final notiService = NotiService();
+  await notiService.initNotification(); // Initialize and start all notifications
+
+  runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {
