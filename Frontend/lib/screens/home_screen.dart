@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'savings_screen.dart';
 import 'input_nic_screen.dart';
 import 'analytics_screen.dart';
@@ -16,31 +15,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 2; // Default to 'Home'
   int? userId; // Variable to store user ID
-
-
-  // commented out userId related functions, moved this to lib/services/db_requests.dart as getUserId()
-  // commented out code can be removed safely
-
-  /*
-  late List<Widget> _pages;
-  @override
-  void initState() {
-    super.initState();
-    _loadUserId(); // Fetch user ID when screen loads
-  }
-  Future<void> _loadUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userId = prefs.getInt("user_id"); // Retrieve stored user ID
-      _pages = [
-        SavingsScreen(),
-        InputNicScreen(),
-        MainHomeScreen(),
-        AnalyticsScreen(),
-        CommunityScreen(),
-      ];
-  });
-  */
 
   // List of pages corresponding to each tab
   final List<Widget> _pages = [

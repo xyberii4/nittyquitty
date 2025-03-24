@@ -1,12 +1,6 @@
-import 'home_screen.dart';
-
-import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:intl/intl.dart';
-import 'package:flutter_application_1/services/db_requests.dart';
-
 
 enum Period {
   day,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-import 'package:flutter_application_1/services/db_requests.dart';
+import 'package:nittyquitty/services/db_requests.dart';
 
 enum Period {
   week,

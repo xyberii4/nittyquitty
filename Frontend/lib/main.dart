@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'screens/landing_screen.dart'; // Import the HomeScreen
-
-import 'package:flutter/material.dart';
 import 'noti_service.dart';
 
 void main() async {
