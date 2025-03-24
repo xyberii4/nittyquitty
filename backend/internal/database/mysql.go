@@ -1,7 +1,9 @@
 package database
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"fmt"
 
@@ -9,8 +11,6 @@ import (
 	"github.com/nittyquitty/internal/config"
 	"github.com/nittyquitty/internal/models"
 	"github.com/nittyquitty/internal/utils"
-	"crypto/sha256"
-	"encoding/hex"
 )
 
 type MySQLClient struct {
@@ -28,10 +28,10 @@ func createTable(db *sql.DB) error {
         Password VARCHAR(64) NOT NULL,
         Snus TINYINT(1) NOT NULL,
         SnusWeeklyUsage INT NOT NULL,
-        SnusStrength INT NOT NULL,
+        SnusStrength DECIMAL(3,2) NOT NULL,
         Vape TINYINT(1) NOT NULL,
         VapeWeeklyUsage INT NOT NULL,
-        VapeStrength INT NOT NULL,
+        VapeStrength DECIMAL(3,2) NOT NULL,
         Cigarette TINYINT(1) NOT NULL,
         CigWeeklyUsage INT NOT NULL,
         Goal INT NOT NULL,
@@ -127,20 +127,23 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 	return nil
 }
 
-// Retrieves user from MySQL
-func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
+func (c *MySQLClient) AuthenticateUser(user models.UserData) (models.UserData, error) {
+	// Hash password
+	hasher := sha256.New()
+	hasher.Write([]byte(user.Password))
+	hashedPassword := hex.EncodeToString(hasher.Sum(nil))
 
-	// Prepare the SELECT statement
-	query := "SELECT * FROM Users WHERE UserID = ?"
+	// Prepare query
+	query := "SELECT * FROM Users WHERE Username = ? AND Password = ?"
 	stmt, err := c.client.Prepare(query)
 	if err != nil {
-		return models.UserData{}, fmt.Errorf("failed to prepare statement: %v", err)
+		return models.UserData{}, fmt.Errorf("failed to prepare statement: %w", err)
 	}
+
 	defer stmt.Close()
 
-	// Execute the query and scan the result into the UserData struct
-	var user models.UserData
-	err = stmt.QueryRow(userID).Scan(
+	// Returns all user data to be stored in the session
+	err = stmt.QueryRow(user.Username, hashedPassword).Scan(
 		&user.UserID,
 		&user.Username,
 		&user.Password,
@@ -157,45 +160,16 @@ func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return models.UserData{}, fmt.Errorf("user not found: %d", userID)
-		}
-		return models.UserData{}, fmt.Errorf("failed to execute statement: %v", err)
-	}
-
-	return user, nil
-}
-
-func (c *MySQLClient) AuthenticateUser(user models.UserData) (models.UserData, error) {
-
-	//Hash password
-	hasher := sha256.New()
-	hasher.Write([]byte(user.Password))
-	hashedPassword := hex.EncodeToString(hasher.Sum(nil))
-
-	// Prepare query
-	query := "SELECT UserID FROM Users WHERE Username = ? AND Password = ?"
-	stmt, err := c.client.Prepare(query)
-	if err != nil {
-		return models.UserData{}, fmt.Errorf("failed to prepare statement: %w", err)
-	}
-
-	defer stmt.Close()
-
-	err = stmt.QueryRow(user.Username, hashedPassword).Scan(&user.UserID)
-	if err != nil {
-		if err == sql.ErrNoRows {
 			return models.UserData{}, ErrInvalidUser
 		}
 		return models.UserData{}, fmt.Errorf("failed to execute statement: %w", err)
 	}
 	user.Password = ""
-	// Only returns userID
 	return user, nil
 }
 
 func (c *MySQLClient) DeleteUser(user models.UserData) error {
-
-	//Hash password
+	// Hash password
 	hasher := sha256.New()
 	hasher.Write([]byte(user.Password))
 	hashedPassword := hex.EncodeToString(hasher.Sum(nil))
@@ -210,7 +184,6 @@ func (c *MySQLClient) DeleteUser(user models.UserData) error {
 	defer stmt.Close()
 
 	res, err := stmt.Exec(user.UserID, hashedPassword)
-
 	if err != nil {
 		return fmt.Errorf("failed to execute statement: %w", err)
 	}
@@ -226,3 +199,4 @@ func (c *MySQLClient) DeleteUser(user models.UserData) error {
 
 	return nil
 }
+
