@@ -5,6 +5,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import 'package:flutter_application_1/services/db_requests.dart';
+
 
 enum Period {
   day,
@@ -44,41 +46,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     _barData = [];
     _xLabels = [];
 
-    /*
-    String apiBaseURL = "http://34.105.133.181:8080";
-    final now = DateTime.now();
-    final nowUTC = now.toUtc();
-    */
-
-
     // currently just random data, but need to connect to database
     switch (_selectedPeriod) {
       case Period.day:
-      /*
-        // 0000 of Today
-        final startDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime(now.year, now.month, now.day).toUtc());
-        final endDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(nowUTC);
-
-        final String apiURL = "$apiBaseURL/api/getConsumption";
-        var request = http.Request("GET", Uri.parse(apiURL))
-          ..headers.addAll({
-            "Accept": "application/json",
-            "Content-Type": "applications/json"
-          })
-          ..body = jsonEncode({
-            "user_id": userId,
-            "start_date": startDate,
-            "end_date": endDate
-          });
-
-          final response = await http.Client().send(request);
-          final responseBody = await response.stream.bytesToString();
-
-          if (response.statusCode != 200) {
-            //ERROR
-          }
-        */
-
       // For "day" -> 24 hours
         _barData = List.generate(24, (i) => (math.Random().nextDouble() * 10).roundToDouble());
         //_xLabels = List.generate(24, (i) => i.toString()); // "0", "1", ..., "23"

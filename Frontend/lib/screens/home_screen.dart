@@ -18,27 +18,30 @@ class _HomeScreenState extends State<HomeScreen> {
   int? userId; // Variable to store user ID
 
 
+  // commented out userId related functions, moved this to lib/services/db_requests.dart as getUserId()
+  // commented out code can be removed safely
 
-  // // List of pages corresponding to each tab
-  // late List<Widget> _pages;
+  /*
+  late List<Widget> _pages;
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId(); // Fetch user ID when screen loads
+  }
+  Future<void> _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getInt("user_id"); // Retrieve stored user ID
+      _pages = [
+        SavingsScreen(),
+        InputNicScreen(),
+        MainHomeScreen(),
+        AnalyticsScreen(),
+        CommunityScreen(),
+      ];
+  });
+  */
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _loadUserId(); // Fetch user ID when screen loads
-  // }
-  // Future<void> _loadUserId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     userId = prefs.getInt("user_id"); // Retrieve stored user ID
-  //     _pages = [
-  //       SavingsScreen(userId: userId), // Pass userId to child screens if needed
-  //       InputNicScreen(userId: userId),
-  //       MainHomeScreen(userId: userId),
-  //       AnalyticsScreen(userId: userId),
-  //       CommunityScreen(userId: userId),
-  //     ];
-  //   });
   // List of pages corresponding to each tab
   final List<Widget> _pages = [
     SavingsScreen(),

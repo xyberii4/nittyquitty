@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 
 class ConsumptionEntry {
@@ -64,4 +66,17 @@ Future<List<ConsumptionEntry>> fetchConsumptionData({
     // error, log maybe?
     return [];
   }
+}
+
+// returns userId, or -1 if an error has occured
+Future<int> getUserId() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  int? userId = prefs.getInt("user_id");
+  if (userId == null) {
+    debugPrint("Error loading user ID");
+    return userId = -1;
+  }
+
+  debugPrint("User ID: $userId.toString()");
+  return userId;
 }
