@@ -79,14 +79,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
-          // 🔹 Background Image
           Positioned.fill(
             child: Image.asset(
-              'images/Tree.jpg', // Local asset
+              'images/Tree.jpg',
               fit: BoxFit.cover,
             ),
           ),
-          // 🔹 Foreground Content (Display selected page)
           Center(child: _pages[_selectedIndex]),
         ],
       ),
