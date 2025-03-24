@@ -64,7 +64,7 @@ func (h *Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate required fields
-	if user.Username == "" || user.Password == "" || user.Goal == 0 || user.GoalDeadline == "" {
+	if user.Username == "" || user.Password == "" || user.Goal < 0 || user.GoalDeadline == "" {
 		http.Error(w, "Missing fields", http.StatusBadRequest)
 		return
 	}
