@@ -18,10 +18,3 @@ func TestAddUser(t *testing.T) {
 		t.Errorf("Failed to add user to MySQL: %v", err)
 	}
 }
-
-func TestGetUser(t *testing.T) {
-	userId := 1
-	if _, err := mysqlClient.GetUser(userId); err != nil {
-		t.Errorf("Failed to get user from MySQL: %v", err)
-	}
-}

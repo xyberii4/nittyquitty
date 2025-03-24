@@ -1,10 +1,6 @@
-import 'home_screen.dart';
-
-import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:intl/intl.dart';
 
 enum Period {
   day,
@@ -44,41 +40,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     _barData = [];
     _xLabels = [];
 
-    /*
-    String apiBaseURL = "http://34.105.133.181:8080";
-    final now = DateTime.now();
-    final nowUTC = now.toUtc();
-    */
-
-
     // currently just random data, but need to connect to database
     switch (_selectedPeriod) {
       case Period.day:
-      /*
-        // 0000 of Today
-        final startDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime(now.year, now.month, now.day).toUtc());
-        final endDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(nowUTC);
-
-        final String apiURL = "$apiBaseURL/api/getConsumption";
-        var request = http.Request("GET", Uri.parse(apiURL))
-          ..headers.addAll({
-            "Accept": "application/json",
-            "Content-Type": "applications/json"
-          })
-          ..body = jsonEncode({
-            "user_id": userId,
-            "start_date": startDate,
-            "end_date": endDate
-          });
-
-          final response = await http.Client().send(request);
-          final responseBody = await response.stream.bytesToString();
-
-          if (response.statusCode != 200) {
-            //ERROR
-          }
-        */
-
       // For "day" -> 24 hours
         _barData = List.generate(24, (i) => (math.Random().nextDouble() * 10).roundToDouble());
         //_xLabels = List.generate(24, (i) => i.toString()); // "0", "1", ..., "23"
@@ -119,20 +83,16 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analytics Page'),
+        title: Text("Analytics Page"),
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back), // Custom back button icon
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        elevation: 0,
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              _backgroundImage, // Make sure the path is correct
+              _backgroundImage,
               fit: BoxFit.cover,
             ),
           ),
@@ -145,7 +105,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
               const SizedBox(height: 16),
 
-              // --- BAR CHART ONLY ---
+              // --- BAR CHART ---
               Card(
                 color: Colors.white,
                 child: Padding(
@@ -183,16 +143,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                             sideTitles: SideTitles(
                               showTitles: true,
                               getTitlesWidget: (value, meta) {
-                                final maxY = meta.max;
-                                final minY = meta.min;
-
-                                // Calculate the step size for the Y-axis labels
-                                final step = (maxY - minY) / 5;  // Divide the range into 5 steps (adjust as needed)
-
-                                final label = (value * step).toStringAsFixed(0);  // Calculate the Y-axis label
+                                final label = (value * (meta.max - meta.min) / 5).toStringAsFixed(0);
 
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8.0), // Add padding
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
                                   child: Text(
                                     label,
                                     style: const TextStyle(

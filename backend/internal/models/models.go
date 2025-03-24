@@ -31,10 +31,10 @@ type UserData struct {
 	Password        string  `json:"password"`
 	Snus            bool    `json:"snus"`
 	SnusWeeklyUsage int     `json:"snus_weekly_usage"`
-	SnusStrength    int     `json:"snus_strength"`
+	SnusStrength    float64 `json:"snus_strength"`
 	Vape            bool    `json:"vape"`
 	VapeWeeklyUsage int     `json:"vape_weekly_usage"`
-	VapeStrength    int     `json:"vape_strength"`
+	VapeStrength    float64 `json:"vape_strength"`
 	Cigarette       bool    `json:"cigarette"`
 	CigWeeklyUsage  int     `json:"cig_weekly_usage"`
 	Goal            float64 `json:"goal"`

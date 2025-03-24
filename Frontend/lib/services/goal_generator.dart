@@ -1,14 +1,17 @@
-import 'db_requests.dart';
-
 /*
+import 'db_requests.dart';
 void main() async {
   await fetchTestData();
 }
-
 Future<void> fetchTestData() async {
-  final userId = 123;
+  final userId = await getUserId();
+  
   final startDate = DateTime.now().subtract(Duration(days: 30));
   final endDate = DateTime.now().subtract(Duration(days: 2));
+
+  if (userId == -1) {
+    return;
+  }
 
   final entries = await fetchConsumptionData(
     userID: userId,
@@ -30,7 +33,9 @@ Future<void> fetchTestData() async {
       entry.timestamp.year,
       entry.timestamp.month,
       entry.timestamp.day,
+      
     );
+    print(entry.mg);
     final quantity = entry.quantity == 0 ? 1 : entry.quantity; // currently quantity is listed as 0, so this is to pretend qty=0 is actually 1
     final usage = entry.mg * quantity;
 

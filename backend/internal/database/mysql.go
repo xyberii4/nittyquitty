@@ -1,7 +1,9 @@
 package database
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"fmt"
 
@@ -26,10 +28,10 @@ func createTable(db *sql.DB) error {
         Password VARCHAR(64) NOT NULL,
         Snus TINYINT(1) NOT NULL,
         SnusWeeklyUsage INT NOT NULL,
-        SnusStrength INT NOT NULL,
+        SnusStrength DECIMAL(3,2) NOT NULL,
         Vape TINYINT(1) NOT NULL,
         VapeWeeklyUsage INT NOT NULL,
-        VapeStrength INT NOT NULL,
+        VapeStrength DECIMAL(3,2) NOT NULL,
         Cigarette TINYINT(1) NOT NULL,
         CigWeeklyUsage INT NOT NULL,
         Goal INT NOT NULL,
@@ -87,6 +89,10 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 		return fmt.Errorf("username already exists: %s", n.Username)
 	}
 
+	hasher := sha256.New()
+	hasher.Write([]byte(n.Password))
+	hashedPassword := hex.EncodeToString(hasher.Sum(nil))
+
 	// Prepare the INSERT statement
 	query := `
 		INSERT INTO Users 
@@ -102,7 +108,7 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 	// Execute the statement with user data
 	_, err = stmt.Exec(
 		n.Username,
-		n.Password,
+		hashedPassword,
 		n.Snus,
 		n.SnusWeeklyUsage,
 		n.SnusStrength,
@@ -121,19 +127,23 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 	return nil
 }
 
-// Retrieves user from MySQL
-func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
-	// Prepare the SELECT statement
-	query := "SELECT * FROM Users WHERE UserID = ?"
+func (c *MySQLClient) AuthenticateUser(user models.UserData) (models.UserData, error) {
+	// Hash password
+	hasher := sha256.New()
+	hasher.Write([]byte(user.Password))
+	hashedPassword := hex.EncodeToString(hasher.Sum(nil))
+
+	// Prepare query
+	query := "SELECT * FROM Users WHERE Username = ? AND Password = ?"
 	stmt, err := c.client.Prepare(query)
 	if err != nil {
-		return models.UserData{}, fmt.Errorf("failed to prepare statement: %v", err)
+		return models.UserData{}, fmt.Errorf("failed to prepare statement: %w", err)
 	}
+
 	defer stmt.Close()
 
-	// Execute the query and scan the result into the UserData struct
-	var user models.UserData
-	err = stmt.QueryRow(userID).Scan(
+	// Returns all user data to be stored in the session
+	err = stmt.QueryRow(user.Username, hashedPassword).Scan(
 		&user.UserID,
 		&user.Username,
 		&user.Password,
@@ -150,32 +160,43 @@ func (c *MySQLClient) GetUser(userID int) (models.UserData, error) {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return models.UserData{}, fmt.Errorf("user not found: %d", userID)
-		}
-		return models.UserData{}, fmt.Errorf("failed to execute statement: %v", err)
-	}
-
-	return user, nil
-}
-
-func (c *MySQLClient) AuthenticateUser(user models.UserData) (models.UserData, error) {
-	// Prepare query
-	query := "SELECT UserID FROM Users WHERE Username = ? AND Password = ?"
-	stmt, err := c.client.Prepare(query)
-	if err != nil {
-		return models.UserData{}, fmt.Errorf("failed to prepare statement: %w", err)
-	}
-
-	defer stmt.Close()
-
-	err = stmt.QueryRow(user.Username, user.Password).Scan(&user.UserID)
-	if err != nil {
-		if err == sql.ErrNoRows {
 			return models.UserData{}, ErrInvalidUser
 		}
 		return models.UserData{}, fmt.Errorf("failed to execute statement: %w", err)
 	}
 	user.Password = ""
-	// Only returns userID
 	return user, nil
 }
+
+func (c *MySQLClient) DeleteUser(user models.UserData) error {
+	// Hash password
+	hasher := sha256.New()
+	hasher.Write([]byte(user.Password))
+	hashedPassword := hex.EncodeToString(hasher.Sum(nil))
+
+	// Prepare query
+	query := "DELETE FROM Users WHERE UserID = ? AND Password = ?"
+	stmt, err := c.client.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("failed to prepare statement: %w", err)
+	}
+
+	defer stmt.Close()
+
+	res, err := stmt.Exec(user.UserID, hashedPassword)
+	if err != nil {
+		return fmt.Errorf("failed to execute statement: %w", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("failed to delete user: %w", ErrInvalidUser)
+	}
+
+	return nil
+}
+

@@ -37,7 +37,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         "vape_weekly_usage": int.tryParse(_vapeWeeklyUsageController.text) ?? 0,
         "vape_strength": int.tryParse(_vapeStrengthController.text) ?? 0,
         "cigarette": _cigaretteSelected,
-        "cigarette_weekly_usage": int.tryParse(_cigaretteWeeklyUsageController.text) ?? 0,
+        "cig_weekly_usage": int.tryParse(_cigaretteWeeklyUsageController.text) ?? 0,
         "goal": double.tryParse(_goalController.text) ?? 0.0,
         "goal_deadline": _goalDeadlineController.text,
       };

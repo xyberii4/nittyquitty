@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'savings_screen.dart';
 import 'input_nic_screen.dart';
 import 'analytics_screen.dart';
@@ -17,28 +16,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 2; // Default to 'Home'
   int? userId; // Variable to store user ID
 
-
-
-  // // List of pages corresponding to each tab
-  // late List<Widget> _pages;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _loadUserId(); // Fetch user ID when screen loads
-  // }
-  // Future<void> _loadUserId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     userId = prefs.getInt("user_id"); // Retrieve stored user ID
-  //     _pages = [
-  //       SavingsScreen(userId: userId), // Pass userId to child screens if needed
-  //       InputNicScreen(userId: userId),
-  //       MainHomeScreen(userId: userId),
-  //       AnalyticsScreen(userId: userId),
-  //       CommunityScreen(userId: userId),
-  //     ];
-  //   });
   // List of pages corresponding to each tab
   final List<Widget> _pages = [
     SavingsScreen(),
@@ -76,14 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
-          // 🔹 Background Image
           Positioned.fill(
             child: Image.asset(
-              'images/Tree.jpg', // Local asset
+              'images/Tree.jpg',
               fit: BoxFit.cover,
             ),
           ),
-          // 🔹 Foreground Content (Display selected page)
           Center(child: _pages[_selectedIndex]),
         ],
       ),
