@@ -18,6 +18,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _vapeWeeklyUsageController = TextEditingController();
   final TextEditingController _vapeStrengthController = TextEditingController();
   final TextEditingController _cigaretteWeeklyUsageController = TextEditingController();
+  final TextEditingController _goalController = TextEditingController();
+  final TextEditingController _goalDeadlineController = TextEditingController();
 
   bool _snusSelected = false;
   bool _vapeSelected = false;
@@ -26,16 +28,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       final Map<String, dynamic> requestBody = {
-        "username": _usernameController.text, // Corrected field name
-        "password": _passwordController.text, // Corrected field name
-        "snus": _snusSelected, // Corrected field name
-        "snus_weekly_usage": int.tryParse(_snusWeeklyUsageController.text) ?? 0, // Corrected field name
-        "snus_strength": int.tryParse(_snusStrengthController.text) ?? 0, // Corrected field name
-        "vape": _vapeSelected, // Corrected field name
-        "vape_weekly_usage": int.tryParse(_vapeWeeklyUsageController.text) ?? 0, // Corrected field name
-        "vape_strength": int.tryParse(_vapeStrengthController.text) ?? 0, // Corrected field name
-        "cigarette": _cigaretteSelected, // Corrected field name
-        "cigarette_weekly_usage": int.tryParse(_cigaretteWeeklyUsageController.text) ?? 0, // Corrected field name
+        "username": _usernameController.text,
+        "password": _passwordController.text,
+        "snus": _snusSelected,
+        "snus_weekly_usage": int.tryParse(_snusWeeklyUsageController.text) ?? 0,
+        "snus_strength": int.tryParse(_snusStrengthController.text) ?? 0,
+        "vape": _vapeSelected,
+        "vape_weekly_usage": int.tryParse(_vapeWeeklyUsageController.text) ?? 0,
+        "vape_strength": int.tryParse(_vapeStrengthController.text) ?? 0,
+        "cigarette": _cigaretteSelected,
+        "cigarette_weekly_usage": int.tryParse(_cigaretteWeeklyUsageController.text) ?? 0,
+        "goal": double.tryParse(_goalController.text) ?? 0.0,
+        "goal_deadline": _goalDeadlineController.text,
       };
 
       // Debug: Print the request body
@@ -255,19 +259,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 const SizedBox(height: 24),
 
+                // Goal Input Field
+                TextFormField(
+                  controller: _goalController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: "Goal",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter a goal";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 8),
+
+                // Goal Deadline Input Field
+                TextFormField(
+                  controller: _goalDeadlineController,
+                  keyboardType: TextInputType.datetime,
+                  decoration: const InputDecoration(
+                    labelText: "Goal Deadline (YYYY-MM-DD)",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter a goal deadline";
+                    }
+                    return null;
+                  },
+                ),
+
                 // Sign Up Button
                 ElevatedButton(
                   onPressed: _signUp,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 50, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: const Text(
                     "Sign Up",
-                    style: TextStyle(fontSize: 18, color: Colors.white)),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  ),
                 ),
               ],
             ),
