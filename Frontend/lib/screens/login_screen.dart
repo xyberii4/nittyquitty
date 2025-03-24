@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'home_screen.dart';
 import 'signup_screen.dart';
@@ -15,56 +16,55 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
-  Future<void> _login() async {
+ Future<void> _login() async {
   if (!_formKey.currentState!.validate()) return;
 
-  // Simulating a delay to mimic a real API call (optional)
-  await Future.delayed(Duration(seconds: 1));
+  final url = Uri.parse("http://34.105.133.181:8080/user/login");
 
-  // Navigate to HomeScreen regardless of login status
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => HomeScreen()),
-  );
-  //Database call waiting on API to be implemented 
-  // final url = Uri.parse("http://34.105.133.181:8080/user/login"); 
+  try {
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "username": _usernameController.text, 
+        "password": _passwordController.text,
+      }),
+    );
 
-  // try {
-  //   final response = await http.post(
-  //     url,
-  //     headers: {"Content-Type": "application/json"},
-  //     body: jsonEncode({
-  //       "username": _usernameController.text, 
-  //       "password": _passwordController.text,
-  //     }),
-  //   );
+    print("Response Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
 
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   await prefs.setInt("user_id", userId);
-
-  //   if (response.statusCode == 200) {
-
-  //     final responseData = jsonDecode(response.body);
-  //     int userId = responseData["user_id"]; // Extract user_id
-
-  //     //Pass userId to HomeScreen      
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => HomeScreen()),
-  //     );
-  //   } else {
-  //     final responseData = jsonDecode(response.body);
-  //     String errorMessage = responseData["error"] ?? "Login failed. Check credentials.";
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
       
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text(errorMessage)),
-  //     );
-  //   }
-  // } catch (e) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(content: Text("Error connecting to server.")),
-  //   );
-  // }
+      if (responseData.containsKey("user_id")) {
+        int userId = responseData["user_id"];
+
+        // Store user_id in SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setInt("user_id", userId);
+
+        // Navigate to HomeScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Login failed: User ID not found.")),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login failed. Check credentials.")),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error connecting to server.")),
+    );
+    print("Error: $e");
+  }
 }
 
 
@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _usernameController, 
                   decoration: InputDecoration(
-                    labelText: "Username",
+                    labelText: "Username battyman",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.person),
                   ),
