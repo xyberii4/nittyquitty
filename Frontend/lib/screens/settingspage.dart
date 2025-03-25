@@ -61,6 +61,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _saveBoolSetting('staySignedIn', value);
               },
             ),
+
+            const SizedBox(height: 32),
+            Center(
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.logout),
+                label: const Text("Sign Out"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                  onPressed: () async {
+                  final confirm = await showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: const Text("Sign Out?"),
+                      content: const Text("Are you sure you want to log out?"),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+                        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Sign Out")),
+                      ],
+                    ),
+                  );
+                  
+                  if (confirm == true) {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.remove('user_id');
+                    await prefs.setBool('staySignedIn', false);
+
+                    if (!context.mounted) return;
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/', // or your login route
+                      (route) => false,
+                    );
+                  }
+                }
+              )
+            ),
           ],
         ),
       ),
