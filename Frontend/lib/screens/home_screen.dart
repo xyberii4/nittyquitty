@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:nittyquitty/noti_service.dart';
+import 'package:nittyquitty/services/db_requests.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'savings_screen.dart';
 import 'input_nic_screen.dart';
 import 'analytics_screen.dart';
@@ -15,7 +19,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 2; // Default to 'Home'
-  int? userId; // Variable to store user ID
   final NotiService notiService = NotiService(); // Notification service instance
 
   @override
@@ -27,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _initializeApp() async {
     WidgetsFlutterBinding.ensureInitialized();
     await notiService.initNotification();
-    // You can add other initialization code here if needed
   }
 
   // List of pages corresponding to each tab
@@ -52,11 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.green,
         title: Image.asset('images/Logo.png',
-          height: 60, // Adjust height as needed
+          height: 60,
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings), // 🔹 Settings Icon
+            icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
@@ -93,11 +95,108 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class MainHomeScreen extends StatelessWidget {
+class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({super.key});
 
   @override
+  _MainHomeScreenState createState() => _MainHomeScreenState();
+}
+
+class _MainHomeScreenState extends State<MainHomeScreen> {
+  int? userId;
+  String recentData = "";
+  String oldData = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNicotineConsumptionData();
+  }
+
+  Future<int> getUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt("user_id");
+    if (userId == null) {
+      debugPrint("Error loading user ID");
+      return -1;
+    }
+    debugPrint("User ID: $userId");
+    return userId;
+  }
+
+  Future<List<dynamic>> fetchConsumptionData({
+  required int userID,
+  required DateTime startDate,
+  required DateTime endDate,
+}) async {
+  const String apiBaseUrl = "http://34.105.133.181:8080";
+
+  try {
+    final request = http.Request(
+      'GET',
+      Uri.parse("$apiBaseUrl/api/getConsumption"),
+    )
+      ..headers['Content-Type'] = 'application/json'
+      ..headers['Accept'] = 'application/json'
+      ..body = jsonEncode({
+        "user_id": userID,
+        "start_date": startDate.toUtc().toIso8601String(),
+        "end_date": endDate.toUtc().toIso8601String(),
+      });
+
+    final response = await http.Client().send(request);
+
+    if (response.statusCode == 200) {
+      final responseBody = await response.stream.bytesToString();
+      return jsonDecode(responseBody) ?? []; // Ensure it always returns a list
+    } else {
+      debugPrint("Error fetching data: ${response.statusCode}");
+      return [];
+    }
+  } catch (e) {
+    debugPrint("Exception in fetchConsumptionData: $e");
+    return [];
+  }
+}
+
+
+  Future<void> _fetchNicotineConsumptionData() async {
+    userId = await getUserId();
+    if (userId == -1) return;
+
+    final now = DateTime.now();
+    const duration = 7;
+
+    recentData = (await fetchConsumptionData(
+      userID: userId!,
+      startDate: now.subtract(const Duration(days: duration)),
+      endDate: now,
+    )).toString();
+
+    oldData = (await fetchConsumptionData(
+      userID: userId!,
+      startDate: now.subtract(const Duration(days: 3 * duration)),
+      endDate: now,
+    )).toString();
+
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Text('Home Page', style: TextStyle(fontSize: 24, color: Colors.white));
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('Home Page', style: TextStyle(fontSize: 24, color: Colors.white)),
+          const SizedBox(height: 20),
+          Text('Recent Data: $recentData',
+              style: const TextStyle(fontSize: 16, color: Colors.white)),
+          const SizedBox(height: 10),
+          Text('Old Data: $oldData',
+              style: const TextStyle(fontSize: 16, color: Colors.white)),
+        ],
+      ),
+    );
   }
 }
