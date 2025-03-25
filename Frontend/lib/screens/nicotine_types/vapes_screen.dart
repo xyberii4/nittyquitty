@@ -33,7 +33,7 @@ class _VapesScreenState extends State<VapesScreen> {
     // Prepare the request body
     final Map<String, dynamic> requestBody = {
       "product": "vape",
-      "userID": await getUserId(), // Replace with the actual user ID
+      "user_id": await getUserId(), // Replace with the actual user ID
       "mg": _mg,
       "quantity": _puffs,
       "cost": _cost,

@@ -34,7 +34,7 @@ class _CustomScreenState extends State<CustomScreen> {
     // Prepare the request body
     final Map<String, dynamic> requestBody = {
       "product": _name, // Use the custom product name
-      "userID": await getUserId(), // Replace with the actual user ID
+      "user_id": await getUserId(), // Replace with the actual user ID
       "mg": _mg,
       "quantity": _quantity,
       "cost": _cost,

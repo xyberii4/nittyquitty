@@ -32,10 +32,11 @@ class _CigarettesScreenState extends State<CigarettesScreen> {
     // Prepare the request body
     final Map<String, dynamic> requestBody = {
       "product": "cigarette",
-      "userID": await getUserId(), // Replace with the actual user ID
+      "user_id": await getUserId(), // Replace with the actual user ID
       "mg": 0, // Cigarettes don't have mg, so set to 0
       "quantity": _cigarettes,
       "cost": _cost,
+      //"ts": //hh:mm
     };
 
     // Convert the request body to JSON

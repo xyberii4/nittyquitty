@@ -36,7 +36,7 @@ class _SnusScreenState extends State<SnusScreen> {
     // Prepare the request body
     final Map<String, dynamic> requestBody = {
       "product": "snus",
-      "userID": await getUserId(), // Replace with the actual user ID
+      "user_id": await getUserId(), // Replace with the actual user ID
       "mg": mg,
       "quantity": _portions,
       "cost": _cost,
