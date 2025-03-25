@@ -3,6 +3,7 @@ import 'nicotine_types/vapes_screen.dart';      // Import from subfolder
 import 'nicotine_types/cigarettes_screen.dart';
 import 'nicotine_types/snus_screen.dart';
 import 'nicotine_types/custom_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class InputNicScreen extends StatelessWidget {
   const InputNicScreen({super.key});
@@ -10,12 +11,19 @@ class InputNicScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,  // 🔹 Makes the body extend behind the AppBar
+      backgroundColor: Colors.transparent, // Transparent background for the screen
       appBar: AppBar(
-        title: Text("Input Nic"),
-        backgroundColor: Colors.transparent, // 🔹 Makes AppBar transparent
-        elevation: 0, // 🔹 Removes shadow
-        automaticallyImplyLeading: false,
+        title: Text("INPUT NIC",
+        style: GoogleFonts.nunito( // Change to Montserrat, Roboto, or any other
+      fontSize: 28,
+      fontWeight: FontWeight.w600, // Medium-bold for professionalism
+      color: Colors.white,
+        ),
+        ),
+        centerTitle: true, // Centers the title for better alignment
+        backgroundColor: Colors.black.withOpacity(0.2), // Subtle transparency in the background
+        elevation: 2, // Adds a slight shadow for depth
+        automaticallyImplyLeading: false, // Removes the default back button
       ),
       body: Stack(
         children: [
