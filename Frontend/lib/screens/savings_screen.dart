@@ -91,12 +91,6 @@ class _SavingsScreenState extends State<SavingsScreen> {
       ),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              'images/Tree.jpg',
-              fit: BoxFit.cover,
-            ),
-          ),
           _buildPeriodToggle(),
           Center(
             child: SingleChildScrollView(

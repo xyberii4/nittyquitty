@@ -27,14 +27,6 @@ class InputNicScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // 🔹 Background Image
-          Positioned.fill(
-            child: Image.asset(
-              'images/Tree.jpg', // Make sure the path is correct
-              fit: BoxFit.cover,
-            ),
-          ),
-
           // 🔹 Foreground Content
           Center(
             child: Column(
