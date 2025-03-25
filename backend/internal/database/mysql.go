@@ -127,6 +127,7 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 	return nil
 }
 
+// Authenticate user and return user data
 func (c *MySQLClient) AuthenticateUser(user models.UserData) (models.UserData, error) {
 	// Hash password
 	hasher := sha256.New()
@@ -199,4 +200,3 @@ func (c *MySQLClient) DeleteUser(user models.UserData) error {
 
 	return nil
 }
-

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:nittyquitty/services/db_requests.dart';
 
 class CigarettesScreen extends StatefulWidget {
   @override
@@ -31,7 +32,7 @@ class _CigarettesScreenState extends State<CigarettesScreen> {
     // Prepare the request body
     final Map<String, dynamic> requestBody = {
       "product": "cigarette",
-      "userID": 123, // Replace with the actual user ID
+      "userID": await getUserId(), // Replace with the actual user ID
       "mg": 0, // Cigarettes don't have mg, so set to 0
       "quantity": _cigarettes,
       "cost": _cost,
