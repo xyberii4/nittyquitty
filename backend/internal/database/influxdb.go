@@ -105,7 +105,7 @@ func (c *InfluxdbClient) GetUserData(user models.UserData, start, end string) ([
 		row := models.NicotineConsumption{
 			Product:   record.ValueByKey("product").(string),
 			UserID:    userID,
-			Timestamp: record.Time(),
+			Timestamp: record.Time().Format("2006-01-02T15:04:05Z"), // Convert to string
 		}
 		// Add all fields to row stuct
 		switch record.Field() {

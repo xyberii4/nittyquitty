@@ -9,12 +9,12 @@ import (
 
 // Struct for each time the user consumes nicotine
 type NicotineConsumption struct {
-	Product   string    `json:"product"`   // Vape/Cigarette/Snus/etc
-	UserID    int       `json:"user_id"`   // Same as MySQL
-	Mg        float64   `json:"mg"`        // Nicotine amount in mg
-	Quantity  int       `json:"quantity"`  // Quantity consumed
-	Cost      float64   `json:"cost"`      // Cost of the product
-	Timestamp time.Time `json:"timestamp"` // Time of consumption
+	Product   string  `json:"product"`   // Vape/Cigarette/Snus/etc
+	UserID    int     `json:"user_id"`   // Same as MySQL
+	Mg        float64 `json:"mg"`        // Nicotine amount in mg
+	Quantity  int     `json:"quantity"`  // Quantity consumed
+	Cost      float64 `json:"cost"`      // Cost of the product
+	Timestamp string  `json:"timestamp"` // Time of consumption
 }
 
 // ConsumptionRequest struct with JSON tags
@@ -41,12 +41,18 @@ type UserData struct {
 	GoalDeadline    string  `json:"goal_deadline"`
 }
 
+func ParseStringtoTime(s string) time.Time {
+	t, _ := time.Parse(time.RFC3339, s)
+	return t
+}
+
 // Converts NicotineConsumption to InfluxDB point
 func (n *NicotineConsumption) ToInfluxPoint() *write.Point {
+	ts := ParseStringtoTime(n.Timestamp)
 	return write.NewPoint(
 		"nicotine_consumption",
 		map[string]string{"product": n.Product, "user_id": strconv.Itoa(n.UserID)},
 		map[string]interface{}{"mg": n.Mg, "quantity": n.Quantity, "cost": n.Cost},
-		time.Now(),
+		ts,
 	)
 }
