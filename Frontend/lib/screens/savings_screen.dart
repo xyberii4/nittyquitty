@@ -11,25 +11,21 @@ class SavingsScreen extends StatefulWidget {
   const SavingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const Text(
-        'Savings Page', style: TextStyle(fontSize: 24, color: Colors.white),
-    );
-  }
-
-  @override
-  State<StatefulWidget> createState() => _SavingsScreenState();
-
+  State<SavingsScreen> createState() => _SavingsScreenState();
 }
 
 class _SavingsScreenState extends State<SavingsScreen> {
-
-  Period _selectedPeriod = Period.week;
-  List<bool> _isSelected = [true, false, false];
+  Period _selectedPeriod = Period.week; // default Period when loading the page
+  final List<bool> _isSelected = [true, false, false];
   double _savingsAmount = 0;
 
-  Future<double> averageSavings(int userID, int duration) async {
+  @override
+  void initState() {
+    super.initState();
+    _updateSavings();
+  }
 
+  Future<double> averageSavings(int userID, int duration) async {
     final now = DateTime.now();
     List<ConsumptionEntry> recentData, oldData;
 
@@ -50,24 +46,30 @@ class _SavingsScreenState extends State<SavingsScreen> {
   }
 
   Future<void> _updateSavings() async {
-
+    /*
     final now = DateTime.now();
     final nowUTC = now.toUtc();
 
     List<ConsumptionEntry> recentData, oldData;
     int expenditure;
+    */
+    double tmpSavings;
     switch (_selectedPeriod) {
       case Period.week:
-        _savingsAmount = await averageSavings(123, 7);
+        tmpSavings = await averageSavings(123, 7);
       case Period.month:
-        _savingsAmount = await averageSavings(123, 31);
+        tmpSavings = await averageSavings(123, 31);
       case Period.year:
-        _savingsAmount = await averageSavings(123, 365);
+        tmpSavings = await averageSavings(123, 365);
     }
+    
+    setState(() {
+      _savingsAmount = tmpSavings;
+    });
   }
 
+  @override
   Widget build(BuildContext context) {
-    _updateSavings();
     return Scaffold(
       body: Stack(
         children: [
@@ -148,6 +150,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
       ),
     );
   }
+
   Widget _buildPeriodToggle() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -196,5 +199,4 @@ class _SavingsScreenState extends State<SavingsScreen> {
       ],
     );
   }
-
 }
