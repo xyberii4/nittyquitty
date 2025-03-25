@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -41,6 +42,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
         "goal": double.tryParse(_goalController.text) ?? 0.0,
         "goal_deadline": _goalDeadlineController.text,
       };
+      
+      // Convert format back into yyyy-mm-dd for the API request
+      String ddMmYyyy = _goalDeadlineController.text;
+      final dateFormatter = DateFormat('dd-MM-yyyy');
+      final isoFormatter = DateFormat('yyyy-MM-dd');
+      try {
+        final date = dateFormatter.parseStrict(ddMmYyyy);
+        final isoDate = isoFormatter.format(date);
+        requestBody["goal_deadline"] = isoDate;
+      } catch (e) {
+        // fallback or handle parse error
+        requestBody["goal_deadline"] = ddMmYyyy;
+      }
 
       // Debug: Print the request body
       print("Request Body: $requestBody");
@@ -279,11 +293,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // Goal Deadline Input Field
                 TextFormField(
                   controller: _goalDeadlineController,
-                  keyboardType: TextInputType.datetime,
+                  readOnly: true,
                   decoration: const InputDecoration(
-                    labelText: "Goal Deadline (YYYY-MM-DD)",
+                    labelText: "Goal Deadline (DD-MM-YYYY)",
                     border: OutlineInputBorder(),
                   ),
+
+                  onTap: () async {
+                    // Dismiss keyboard if open
+                    FocusScope.of(context).requestFocus(FocusNode());
+
+                    // Show the date picker
+                    final pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+
+                    if (pickedDate != null) {
+                      // Format pickedDate as DD-MM-YYYY
+                      final formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+                      setState(() {
+                        _goalDeadlineController.text = formattedDate;
+                      });
+                    }
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Please enter a goal deadline";
