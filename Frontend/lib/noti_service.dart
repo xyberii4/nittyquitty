@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'services/db_requests.dart';
 
 class NotiService {
   final FlutterLocalNotificationsPlugin notificationPlugin =
@@ -28,36 +30,45 @@ class NotiService {
   ];
 
   final String apiBaseUrl = "http://34.105.133.181:8080";
-  final int userId = 123;
+  int? userId;
 
   Future<void> initNotification() async {
-    const AndroidInitializationSettings androidInitSettings =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+    try {
+      userId = await getUserId();
 
-    const InitializationSettings initSettings =
-    InitializationSettings(android: androidInitSettings);
+      const AndroidInitializationSettings androidInitSettings =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    await notificationPlugin.initialize(initSettings);
+      const InitializationSettings initSettings =
+      InitializationSettings(android: androidInitSettings);
 
-    scheduleMorningNotification();
-    scheduleEveningNotification();
-    analyzeUsageAndScheduleSmartNotifications();
+      await notificationPlugin.initialize(initSettings);
+
+      scheduleMorningNotification();
+      scheduleEveningNotification();
+      await analyzeUsageAndScheduleSmartNotifications();
+    } catch (e) {
+      print('[NotiService] Error during initialization: $e');
+    }
   }
 
   Future<void> showNotification(String title, String body) async {
-    await notificationPlugin.show(
-      Random().nextInt(1000000),
-      title,
-      body,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'channel_id',
-          'channel_name',
-          importance: Importance.max,
-          priority: Priority.high,
+    try {
+      await notificationPlugin.show(
+        Random().nextInt(1000000),
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'channel_id',
+            'channel_name',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+    }
   }
 
   void scheduleMorningNotification() {
@@ -89,6 +100,13 @@ class NotiService {
     final String endDate = now.toIso8601String();
 
     try {
+      print('[NotiService] Making API request to: $apiBaseUrl/api/getConsumption');
+      print('[NotiService] Request payload: ' + jsonEncode({
+        "user_id": userId,
+        "start_date": startDate,
+        "end_date": endDate,
+      }));
+
       final request = http.Request('GET', Uri.parse("$apiBaseUrl/api/getConsumption"))
         ..headers['Content-Type'] = 'application/json'
         ..headers['Accept'] = 'application/json'
@@ -101,17 +119,24 @@ class NotiService {
       final response = await http.Client().send(request);
       final responseBody = await response.stream.bytesToString();
 
-      if (response.statusCode != 200) return [];
+      if (response.statusCode != 200) {
+
+        return [];
+      }
 
       final List<dynamic> data = jsonDecode(responseBody);
       return data.map((entry) => DateTime.parse(entry['timestamp'])).toList();
     } catch (e) {
+      print('[NotiService] Error fetching usage times: $e');
       return [];
     }
   }
 
   Future<Map<int, List<int>>> analyzeUsagePatterns() async {
+    print('[NotiService] Analyzing usage patterns...');
     List<DateTime> usageData = await getUsageTimes();
+    print('[NotiService] Found ${usageData.length} usage records');
+
     Map<int, List<int>> frequentHours = {};
 
     for (var entry in usageData) {
@@ -123,6 +148,7 @@ class NotiService {
 
     Map<int, List<int>> topHours = {};
     frequentHours.forEach((day, hours) {
+      print('[NotiService] Day $day has ${hours.length} usage entries');
       Map<int, int> hourCounts = {};
       for (var h in hours) {
         hourCounts[h] = (hourCounts[h] ?? 0) + 1;
@@ -132,10 +158,12 @@ class NotiService {
       topHours[day] = sortedHours.take(2).map((e) => e.key).toList();
     });
 
+    print('[NotiService] Top usage hours: $topHours');
     return topHours;
   }
 
   Future<void> analyzeUsageAndScheduleSmartNotifications() async {
+    print('[NotiService] Starting smart notification analysis');
     Map<int, List<int>> topUsageHours = await analyzeUsagePatterns();
 
     final Map<int, List<int>> peakSchedule = {};
@@ -146,6 +174,7 @@ class NotiService {
       peakSchedule[day] = _mergeHours(dataHours, defaultHours);
     }
 
+    print('[NotiService] Final notification schedule:');
     peakSchedule.forEach((day, hours) {
       print("   ${_getWeekdayName(day).padRight(9)}: ${hours.map((h) => '${h.toString().padLeft(2, '0')}:00').join(', ')}");
     });
@@ -165,7 +194,10 @@ class NotiService {
             now.minute == 0 &&
             !_sentSmartHours.contains(targetHour)) {
           _sentSmartHours.add(targetHour);
-          // final timeStr = DateFormat('HH:mm').format(now);
+
+          final timeStr = DateFormat('HH:mm').format(now);
+          print('[NotiService] Triggering smart notification at $timeStr');
+
           showNotification("Craving Alert!",
               "This is your scheduled alert to stay smoke-free!");
         }
@@ -177,20 +209,19 @@ class NotiService {
     final merged = <int>[];
     // final uniqueHours = {...dataHours, ...defaultHours};
 
-    // Prioritize data hours first
     for (final hour in dataHours) {
       if (merged.length < 2 && !merged.contains(hour)) {
         merged.add(hour);
       }
     }
 
-    // Fill remaining slots with defaults
     for (final hour in defaultHours) {
       if (merged.length < 2 && !merged.contains(hour)) {
         merged.add(hour);
       }
     }
 
+    print('[NotiService] Merged hours: $merged (from data: $dataHours, defaults: $defaultHours)');
     return merged;
   }
 
@@ -201,3 +232,5 @@ class NotiService {
     ][weekday - 1];
   }
 }
+
+

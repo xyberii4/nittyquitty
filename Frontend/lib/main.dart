@@ -20,7 +20,7 @@ void main() async {
   }
 
   final notiService = NotiService();
-  await notiService.initNotification(); // Initialize and start all notifications
+  await notiService.initNotification();
 
   runApp(MyApp(startScreen: startScreen));
 }

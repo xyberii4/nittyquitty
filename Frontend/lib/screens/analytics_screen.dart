@@ -82,6 +82,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final barMax = _barData.isNotEmpty ? _barData.reduce(math.max) : 0;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text("Analytics Page"),
         backgroundColor: Colors.transparent,
@@ -90,12 +91,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       ),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              _backgroundImage,
-              fit: BoxFit.cover,
-            ),
-          ),
           SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
