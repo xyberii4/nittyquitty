@@ -83,7 +83,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
-          "Analytics Page",
+          "ANALYTICS PAGE",
         style: GoogleFonts.nunito( // Change to Montserrat, Roboto, or any other
             fontSize: 28,
             fontWeight: FontWeight.w600, // Medium-bold for professionalism

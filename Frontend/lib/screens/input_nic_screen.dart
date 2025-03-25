@@ -11,7 +11,6 @@ class InputNicScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //extendBodyBehindAppBar: true,  // 🔹 Makes the body extend behind the AppBar
       backgroundColor: Colors.transparent, // Transparent background for the screen
       appBar: AppBar(
         title: Text("INPUT NIC",
@@ -28,14 +27,6 @@ class InputNicScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // 🔹 Background Image
-          Positioned.fill(
-            child: Image.asset(
-              'images/Tree.jpg', // Make sure the path is correct
-              fit: BoxFit.cover,
-            ),
-          ),
-
           // 🔹 Foreground Content
           Center(
             child: Column(
