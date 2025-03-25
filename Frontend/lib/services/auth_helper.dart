@@ -3,11 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:nittyquitty/screens/home_screen.dart'; // Adjust path to your HomeScreen
+import 'package:nittyquitty/screens/home_screen.dart';
 
-/// Attempts to log in with [username] & [password].
-/// If successful, stores user_id in SharedPreferences and navigates to HomeScreen.
-/// If fails, shows a SnackBar error.
+// If successful, store user_id in SharedPreferences and navigate to HomeScreen
+// If fail, show a SnackBar error
 
 Future<void> attemptLogin(BuildContext context, String username, String password) async {
   final loginUrl = Uri.parse('http://34.105.133.181:8080/user/login');

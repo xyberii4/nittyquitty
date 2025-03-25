@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 
 class NotiService {
   final FlutterLocalNotificationsPlugin notificationPlugin =
@@ -166,7 +165,7 @@ class NotiService {
             now.minute == 0 &&
             !_sentSmartHours.contains(targetHour)) {
           _sentSmartHours.add(targetHour);
-          final timeStr = DateFormat('HH:mm').format(now);
+          // final timeStr = DateFormat('HH:mm').format(now);
           showNotification("Craving Alert!",
               "This is your scheduled alert to stay smoke-free!");
         }
@@ -176,7 +175,7 @@ class NotiService {
 
   List<int> _mergeHours(List<int> dataHours, List<int> defaultHours) {
     final merged = <int>[];
-    final uniqueHours = {...dataHours, ...defaultHours};
+    // final uniqueHours = {...dataHours, ...defaultHours};
 
     // Prioritize data hours first
     for (final hour in dataHours) {
