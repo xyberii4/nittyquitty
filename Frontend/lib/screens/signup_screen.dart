@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:nittyquitty/screens/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -79,8 +81,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Sign up successful!')),
           );
-          Navigator.pop(context); // Go back to the previous screen
+
+          // Automatically log in with the same username/password
+          final loginUrl = Uri.parse('http://34.105.133.181:8080/user/login');
+          final loginResponse = await http.post(
+            loginUrl,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({
+              "username": _usernameController.text,
+              "password": _passwordController.text,
+            }),
+          );
+
+          // Check login response
+          if (loginResponse.statusCode == 200) {
+            final loginData = jsonDecode(loginResponse.body);
+
+            if (loginData.containsKey("user_id")) {
+              int userId = loginData["user_id"];
+
+              // Store user_id in SharedPreferences
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setInt("user_id", userId);
+
+              // Navigate directly to HomeScreen
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Login failed: user_id not found.")),
+              );
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Login failed. Check credentials.")),
+            );
+          }
         } else {
+          // Handle sign-up error
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to sign up. Error: ${response.body}')),
           );
