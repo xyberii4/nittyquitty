@@ -88,7 +88,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   if (confirm == true) {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('user_id');
-                    await prefs.setBool('staySignedIn', false);
 
                     if (!context.mounted) return;
                     Navigator.of(context).pushNamedAndRemoveUntil(
