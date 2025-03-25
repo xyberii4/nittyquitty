@@ -1,40 +1,27 @@
 package database
 
 import (
-	"math/rand"
 	"testing"
-	"time"
 
 	"github.com/nittyquitty/internal/models"
 )
 
 // Writes test data to InfluxDB
 func TestInfluxDBWrite(t *testing.T) {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	// Define the start and end dates
-	endDate := time.Now()
-	startDate := endDate.AddDate(0, -3, 0) // Subtract 3 months from the current date
-
-	// Loop through each day for 3 months
-	for date := startDate; date.Before(endDate); date = date.AddDate(0, 0, 1) {
-		// Generate random data for each day
-		testData := models.NicotineConsumption{
-			UserID:    123,
-			Product:   "vapes",
-			Mg:        1 + r.Float64()*49,
-			Quantity:  r.Intn(10) + 1,
-			Cost:      0.5 + r.Float64()*19.5,
-			Timestamp: date,
-		}
-
-		// Write data to InfluxDB
-		if err := influxdbClient.WriteData(testData); err != nil {
-			t.Errorf("Failed to write data for date %v to InfluxDB: %v", date, err)
-		}
+	testdata := models.NicotineConsumption{
+		UserID:    -1,
+		Product:   "test",
+		Mg:        1.0,
+		Quantity:  10,
+		Cost:      1.0,
+		Timestamp: "2025-03-25T15:00:00Z",
 	}
 
-	t.Logf("Successfully populated InfluxDB with 3 months of fake data")
+	if err := influxdbClient.WriteData(testdata); err != nil {
+		t.Errorf("Failed to write data to InfluxDB: %v", err)
+	} else {
+		t.Logf("Successfully wrote data to InfluxDB")
+	}
 }
 
 func TestInfluxDBQuery(t *testing.T) {
