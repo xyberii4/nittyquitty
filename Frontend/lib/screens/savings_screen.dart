@@ -46,6 +46,8 @@ class _SavingsScreenState extends State<SavingsScreen> {
   }
 
   Future<void> _updateSavings() async {
+    int userId = await getUserId();
+
     /*
     final now = DateTime.now();
     final nowUTC = now.toUtc();
@@ -53,14 +55,15 @@ class _SavingsScreenState extends State<SavingsScreen> {
     List<ConsumptionEntry> recentData, oldData;
     int expenditure;
     */
+    
     double tmpSavings;
     switch (_selectedPeriod) {
       case Period.week:
-        tmpSavings = await averageSavings(123, 7);
+        tmpSavings = await averageSavings(userId, 7);
       case Period.month:
-        tmpSavings = await averageSavings(123, 31);
+        tmpSavings = await averageSavings(userId, 31);
       case Period.year:
-        tmpSavings = await averageSavings(123, 365);
+        tmpSavings = await averageSavings(userId, 365);
     }
     
     setState(() {

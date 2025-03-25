@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:nittyquitty/services/db_requests.dart';
 
 class CustomScreen extends StatefulWidget {
   @override
@@ -33,7 +34,7 @@ class _CustomScreenState extends State<CustomScreen> {
     // Prepare the request body
     final Map<String, dynamic> requestBody = {
       "product": _name, // Use the custom product name
-      "userID": 123, // Replace with the actual user ID
+      "userID": await getUserId(), // Replace with the actual user ID
       "mg": _mg,
       "quantity": _quantity,
       "cost": _cost,
