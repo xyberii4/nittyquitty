@@ -3,11 +3,12 @@ import 'savings_screen.dart';
 import 'input_nic_screen.dart';
 import 'analytics_screen.dart';
 import 'community_screen.dart';
-import 'settingspage.dart'; // Import the new Settings screen
+import 'settingspage.dart';
+import 'package:flutter_application_1/noti_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
- 
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -15,7 +16,23 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 2; // Default to 'Home'
   int? userId; // Variable to store user ID
+  final NotiService notiService = NotiService(); // Notification service instance
 
+<<<<<<< HEAD
+  @override
+  void initState() {
+    super.initState();
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await notiService.initNotification();
+    // You can add other initialization code here if needed
+  }
+
+=======
+>>>>>>> e47bde73ca006f16db061c92b609c9c401b031f7
   // List of pages corresponding to each tab
   final List<Widget> _pages = [
     SavingsScreen(),
@@ -37,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.green,
         title: Image.asset('images/Logo.png',
-        height: 60, // Adjust height as needed
+          height: 60, // Adjust height as needed
         ),
         actions: [
           IconButton(
