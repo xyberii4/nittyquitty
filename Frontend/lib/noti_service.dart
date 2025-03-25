@@ -194,8 +194,10 @@ class NotiService {
             now.minute == 0 &&
             !_sentSmartHours.contains(targetHour)) {
           _sentSmartHours.add(targetHour);
+
           final timeStr = DateFormat('HH:mm').format(now);
           print('[NotiService] Triggering smart notification at $timeStr');
+
           showNotification("Craving Alert!",
               "This is your scheduled alert to stay smoke-free!");
         }
@@ -205,7 +207,7 @@ class NotiService {
 
   List<int> _mergeHours(List<int> dataHours, List<int> defaultHours) {
     final merged = <int>[];
-    final uniqueHours = {...dataHours, ...defaultHours};
+    // final uniqueHours = {...dataHours, ...defaultHours};
 
     for (final hour in dataHours) {
       if (merged.length < 2 && !merged.contains(hour)) {

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'home_screen.dart';
+import 'package:nittyquitty/services/auth_helper.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,55 +13,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
- Future<void> _login() async {
+
+ Future<void> _trylogin() async {
   if (!_formKey.currentState!.validate()) return;
-
-  final url = Uri.parse("http://34.105.133.181:8080/user/login");
-
-  try {
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "username": _usernameController.text, 
-        "password": _passwordController.text,
-      }),
-    );
-
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      
-      if (responseData.containsKey("user_id")) {
-        int userId = responseData["user_id"];
-
-        // Store user_id in SharedPreferences
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setInt("user_id", userId);
-
-        // Navigate to HomeScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login failed: User ID not found.")),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login failed. Check credentials.")),
-      );
-    }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error connecting to server.")),
-    );
-    print("Error: $e");
-  }
+  await attemptLogin(
+    context,
+    _usernameController.text,
+    _passwordController.text,
+  );
 }
 
 
@@ -135,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Login Button
                 ElevatedButton(
-                  onPressed: _login,
+                  onPressed: _trylogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 12),

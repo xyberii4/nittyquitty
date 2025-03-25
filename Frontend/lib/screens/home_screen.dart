@@ -52,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.green,
         title: Image.asset('images/Logo.png',
           height: 60, // Adjust height as needed
