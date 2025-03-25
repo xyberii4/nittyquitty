@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
 
 enum Period {
@@ -81,9 +82,17 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text("Analytics Page"),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: Text(
+          "Analytics Page",
+        style: GoogleFonts.nunito( // Change to Montserrat, Roboto, or any other
+            fontSize: 28,
+            fontWeight: FontWeight.w600, // Medium-bold for professionalism
+            color: Colors.white,
+        ),
+        ),
+        centerTitle: true, // Centers the title for better alignment
+        backgroundColor: Colors.black.withOpacity(0.2), // Subtle transparency
+        elevation: 2, // Adds a small shadow for depth
         automaticallyImplyLeading: false,
       ),
       body: Stack(
