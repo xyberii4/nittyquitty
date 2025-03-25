@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:nittyquitty/noti_service.dart';
 import 'package:nittyquitty/services/db_requests.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'savings_screen.dart';
 import 'input_nic_screen.dart';
 import 'analytics_screen.dart';
@@ -184,18 +185,39 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('Home Page', style: TextStyle(fontSize: 24, color: Colors.white)),
-          const SizedBox(height: 20),
-          Text('Recent Data: $recentData',
-              style: const TextStyle(fontSize: 16, color: Colors.white)),
-          const SizedBox(height: 10),
-          Text('Old Data: $oldData',
-              style: const TextStyle(fontSize: 16, color: Colors.white)),
-        ],
+    return Scaffold(
+      backgroundColor: Colors.transparent, // Transparent background
+      appBar: AppBar(
+        title: Text(
+          "HOME PAGE", // Title for the app bar
+          style: GoogleFonts.nunito( // Professional font
+            fontSize: 28, // Font size
+            fontWeight: FontWeight.w600, // Medium-bold weight for a professional look
+            color: Colors.white, // White text color
+          ),
+        ),
+        centerTitle: true, // Centers the title
+        backgroundColor: Colors.black.withOpacity(0.2), // Semi-transparent background
+        elevation: 2, // Adds slight shadow for depth
+        automaticallyImplyLeading: false, // No back button by default
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, // Vertically center the content
+          children: [
+            
+            const SizedBox(height: 20),
+            Text(
+              'Recent Data: $recentData', // Display recent data
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Old Data: $oldData', // Display old data
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }
