@@ -44,11 +44,11 @@ func (h *Handler) LogConsumption(w http.ResponseWriter, r *http.Request) {
 	// Write to InfluxDB
 	if err := h.InfluxDBClient.WriteData(usageRow); err != nil {
 		http.Error(w, "Failed to write data to InfluxDB", http.StatusInternalServerError)
-		utils.Logger.Printf("Failed to write data to InfluxDB: %v", err)
+		utils.Logger.Printf("Failed to write data to InfluxDB for userID %d: %v", usageRow.UserID, err)
 		return
 	}
 
-	utils.Logger.Printf("Consumption data for user %d logged.", usageRow.UserID)
+	utils.Logger.Printf("Consumption data for userID %d logged.", usageRow.UserID)
 }
 
 // Add new user to MySQL
@@ -138,14 +138,14 @@ func (h *Handler) GetConsumption(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := models.UserData{
-		UserID: int(cRequest.UserID),
+		UserID: cRequest.UserID,
 	}
 
 	// Retrieve rows from InfluxDB
 	results, err := h.InfluxDBClient.GetUserData(user, cRequest.StartDate, cRequest.EndDate)
 	if err != nil {
 		http.Error(w, "Failed to get data from InfluxDB", http.StatusInternalServerError)
-		utils.Logger.Printf("Failed to get data from InfluxDB: %v", err)
+		utils.Logger.Printf("Failed to get data from InfluxDB for userID: %d: %v", user.UserID, err)
 		return
 	}
 
@@ -153,11 +153,10 @@ func (h *Handler) GetConsumption(w http.ResponseWriter, r *http.Request) {
 	jsonResults, err := json.Marshal(results)
 	if err != nil {
 		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
-		utils.Logger.Printf("Failed to marshal JSON: %v", err)
 		return
 	}
 
 	w.Write(jsonResults)
 
-	utils.Logger.Printf("Data retrieved from InfluxDB for user: %d", user.UserID)
+	utils.Logger.Printf("Data retrieved from InfluxDB for userID: %d", user.UserID)
 }
