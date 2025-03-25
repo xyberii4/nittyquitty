@@ -168,20 +168,24 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     final now = DateTime.now();
     const duration = 7;
 
-    recentData = (await fetchConsumptionData(
+    // Fetch recent data and sum mg intake
+    final recentList = await fetchConsumptionData(
       userID: userId!,
       startDate: now.subtract(const Duration(days: duration)),
       endDate: now,
-    )).toString();
+    );
 
-    oldData = (await fetchConsumptionData(
-      userID: userId!,
-      startDate: now.subtract(const Duration(days: 3 * duration)),
-      endDate: now,
-    )).toString();
+    double totalRecentMg = recentList
+        .map((item) => (item['mg'] ?? 0.0)) // Extract mg values
+        .fold(0.0, (sum, mg) => sum + mg);  // Sum up mg values
 
-    setState(() {});
+    setState(() {
+      recentData = "${totalRecentMg.toStringAsFixed(2)} mg"; // Display only the sum
+    });
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -202,23 +206,18 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
         automaticallyImplyLeading: false, // No back button by default
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // Vertically center the content
-          children: [
-            
-            const SizedBox(height: 20),
-            Text(
-              'Recent Data: $recentData', // Display recent data
-              style: const TextStyle(fontSize: 16, color: Colors.white),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Old Data: $oldData', // Display old data
-              style: const TextStyle(fontSize: 16, color: Colors.white),
-            ),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 20),
+          Text(
+            'Recent Nicotine Intake: $recentData',
+            style: const TextStyle(fontSize: 18, color: Colors.white),
+          ),
+        ],
       ),
+    ),
+
     );
   }
 }
