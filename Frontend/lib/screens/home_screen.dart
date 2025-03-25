@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:nittyquitty/noti_service.dart';
 import 'savings_screen.dart';
 import 'input_nic_screen.dart';
 import 'analytics_screen.dart';
 import 'community_screen.dart';
 import 'settingspage.dart';
-import 'package:flutter_application_1/noti_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,7 +18,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int? userId; // Variable to store user ID
   final NotiService notiService = NotiService(); // Notification service instance
 
-<<<<<<< HEAD
   @override
   void initState() {
     super.initState();
@@ -31,8 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
     // You can add other initialization code here if needed
   }
 
-=======
->>>>>>> e47bde73ca006f16db061c92b609c9c401b031f7
   // List of pages corresponding to each tab
   final List<Widget> _pages = [
     SavingsScreen(),

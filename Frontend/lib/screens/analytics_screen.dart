@@ -27,9 +27,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   List<double> _barData = [];
   List<String> _xLabels = [];
 
-  // Background image
-  final String _backgroundImage = 'images/Tree.jpg';
-
   @override
   void initState() {
     super.initState();
