@@ -11,7 +11,6 @@ class InputNicScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //extendBodyBehindAppBar: true,  // 🔹 Makes the body extend behind the AppBar
       backgroundColor: Colors.transparent, // Transparent background for the screen
       appBar: AppBar(
         title: Text("INPUT NIC",
