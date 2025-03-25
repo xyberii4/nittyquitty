@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nittyquitty/services/db_requests.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 enum Period {
   week,
@@ -74,6 +75,20 @@ class _SavingsScreenState extends State<SavingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent, // Transparent background for the screen
+      appBar: AppBar(
+        title: Text("SAVINGS SCREEN",
+        style: GoogleFonts.nunito( // Change to Montserrat, Roboto, or any other
+      fontSize: 28,
+      fontWeight: FontWeight.w600, // Medium-bold for professionalism
+      color: Colors.white,
+        ),
+        ),
+        centerTitle: true, // Centers the title for better alignment
+        backgroundColor: Colors.black.withOpacity(0.2), // Subtle transparency in the background
+        elevation: 2, // Adds a slight shadow for depth
+        automaticallyImplyLeading: false, // Removes the default back button
+      ),
       body: Stack(
         children: [
           Positioned.fill(
