@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:nittyquitty/screens/nicotine_types/functions.dart';
 import 'dart:convert';
 import 'package:nittyquitty/services/db_requests.dart';
 
@@ -36,7 +37,7 @@ class _CigarettesScreenState extends State<CigarettesScreen> {
       "mg": 10, // Cigarettes mg set to 10
       "quantity": _cigarettes,
       "cost": _cost,
-      //"ts": //hh:mm
+      "timestamp": timeToISO(_selectedTime),
     };
 
     // Convert the request body to JSON

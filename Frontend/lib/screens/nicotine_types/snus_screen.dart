@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:nittyquitty/screens/nicotine_types/functions.dart';
 import 'dart:convert';
 import 'package:nittyquitty/services/db_requests.dart';
 
@@ -40,6 +41,7 @@ class _SnusScreenState extends State<SnusScreen> {
       "mg": mg,
       "quantity": _portions,
       "cost": _cost,
+      "timestamp": timeToISO(_selectedTime),
     };
 
     // Convert the request body to JSON
