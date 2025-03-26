@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
+//import 'package:nittyquitty/services/db_requests.dart';
 
 enum Period {
   day,
@@ -38,10 +39,20 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     _barData = [];
     _xLabels = [];
 
+    //final now = DateTime.now();
+    //final today = DateTime(now.year, now.month, now.day);
+
     // currently just random data, but need to connect to database
     switch (_selectedPeriod) {
       case Period.day:
-      // For "day" -> 24 hours
+      /*
+        List<ConsumptionEntry> entries = await fetchConsumptionData(startDate: today, endDate: today.add(const Duration(days: 1)));
+        List<double> _barData = List.filled(24, 0.0);
+
+        for (var entry in entries) {
+          final hour = entry.timestamp.hour;
+          _barData[hour] += entry.mg ?? 0.0;
+        }*/
         _barData = List.generate(24, (i) => (math.Random().nextDouble() * 10).roundToDouble());
         //_xLabels = List.generate(24, (i) => i.toString()); // "0", "1", ..., "23"
         _xLabels = [];

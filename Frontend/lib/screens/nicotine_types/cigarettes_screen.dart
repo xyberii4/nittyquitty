@@ -32,8 +32,8 @@ class _CigarettesScreenState extends State<CigarettesScreen> {
     // Prepare the request body
     final Map<String, dynamic> requestBody = {
       "product": "cigarette",
-      "user_id": await getUserId(), // Replace with the actual user ID
-      "mg": 0, // Cigarettes don't have mg, so set to 0
+      "user_id": await getUserId(),
+      "mg": 10, // Cigarettes mg set to 10
       "quantity": _cigarettes,
       "cost": _cost,
       //"ts": //hh:mm

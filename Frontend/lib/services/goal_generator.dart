@@ -51,41 +51,6 @@ Future<void> fetchTestData() async {
 }
 */
 
-// Calculate final nicotine intake for each type entered by user
-double cigNicotineUsage(int count) {
-  return count*10; // 1 cigarette is 10mg
-}
-
-double vapeNicotineUsage(int hits, double mg) {
-  return hits*mg/200; // 1 hit of 200mg of vape is 1mg intake
-}
-
-double snusNicotineUsage(int pouches, int dots) {
-  if (dots == 1) {
-    return pouches*4.0; // 4 mg per pouch if 1 dot (mild)
-  }
-  else if (dots == 2) {
-    return pouches*6.0; // 6 mg per pouch if 2 dot (medium)
-  }
-  else if (dots == 3) {
-    return pouches*10.0; // 10 mg per pouch if 3 dot (strong)
-  }
-  else if (dots == 4) {
-    return pouches*14.0; // 14 mg per pouch if 4 dot (extra strong)
-  }
-  else if (dots == 5) {
-    return pouches*18.5; // 17-20 mg per pouch if 5 dot (ultra strong)
-  }
-  else if (dots == 6) {
-    return pouches*21.0; // estimated 21 mg per pouch if 6 dot
-  }
-  return -1;
-}
-
-double customNicotineUsage(int quantity, double mg) {
-  return quantity*mg;
-}
-
 // currently just takes an average of the past week, and does 0.8 * avg
 double computeNextDayTarget(Map<DateTime, double> dailyTotals, {int daysLookback = 7}) {
   if (dailyTotals.isEmpty) return 0.0;

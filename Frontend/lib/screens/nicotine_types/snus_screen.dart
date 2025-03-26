@@ -100,17 +100,17 @@ class _SnusScreenState extends State<SnusScreen> {
   double _convertStrengthToMg(String strength) {
     switch (strength) {
       case '1 dot':
-        return 8.0;
+        return 4.0;
       case '2 dot':
-        return 16.0;
+        return 6.0;
       case '3 dot':
-        return 24.0;
+        return 10.0;
       case '4 dot':
-        return 32.0;
+        return 14.0;
       case '5 dot':
-        return 40.0;
+        return 18.5;
       case '6 dot':
-        return 48.0;
+        return 21.0;
       default:
         return 0.0;
     }
