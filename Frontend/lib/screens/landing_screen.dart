@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart'; // Import the login page
 
 class LandingScreen extends StatelessWidget {
+  const LandingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
