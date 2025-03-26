@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:nittyquitty/screens/nicotine_types/functions.dart';
+import 'package:nittyquitty/screens/nicotine_types/input_nig_functions.dart';
 import 'dart:convert';
 import 'package:nittyquitty/services/db_requests.dart';
 
