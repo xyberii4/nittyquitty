@@ -12,19 +12,17 @@ class _CustomScreenState extends State<CustomScreen> {
   final _formKey = GlobalKey<FormState>(); // Key for the form
   final TextEditingController _timeController = TextEditingController();
 
-  String _name = ''; // Product name
-  int _quantity = 0; // Quantity
-  double _mg = 0.0; // Number of milligrams of nicotine
-  double _cost = 0.0; // Cost
-  DateTime? _selectedTime; // User-entered time
+  String _name = '';
+  int _quantity = 0;
+  double _mg = 0.0;
+  double _cost = 0.0;
+  DateTime? _selectedTime;
 
-  // Function to validate time input
   bool _isValidTime(String input) {
     final RegExp timeRegex = RegExp(r'^(?:[01]?\d|2[0-3]):[0-5]\d$'); // Matches 00:00 - 23:59
     return timeRegex.hasMatch(input);
   }
 
-  // Function to log consumption data to the backend
   Future<void> _logConsumption() async {
     if (_selectedTime == null) {
       // Ensure time is selected
@@ -63,6 +61,7 @@ class _CustomScreenState extends State<CustomScreen> {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
+                  Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 },
                 child: Text('OK'),
@@ -153,7 +152,7 @@ class _CustomScreenState extends State<CustomScreen> {
                 TextFormField(
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                    labelText: 'Number of mg',
+                    labelText: 'Number of mg (Each)',
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (value) {

@@ -63,6 +63,7 @@ class _CigarettesScreenState extends State<CigarettesScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                 },
                 child: Text('OK'),
               ),
