@@ -22,8 +22,8 @@ class CommunityScreen extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          'Community Page', 
-          style: TextStyle(fontSize: 24, color: Colors.white),
+          'Coming Soon!', 
+          style: TextStyle(fontSize: 36, color: Colors.white),
         ),
       ),
     );
