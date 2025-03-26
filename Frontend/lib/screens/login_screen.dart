@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _usernameController, 
                   decoration: InputDecoration(
-                    labelText: "Username battyman",
+                    labelText: "Username",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.person),
                   ),
