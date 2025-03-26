@@ -51,9 +51,9 @@ Future<void> fetchTestData() async {
 }
 */
 
+// 1 cig is 10mg
 
 // currently just takes an average of the past week, and does 0.8 * avg
-
 double computeNextDayTarget(Map<DateTime, double> dailyTotals, {int daysLookback = 7}) {
   if (dailyTotals.isEmpty) return 0.0;
 

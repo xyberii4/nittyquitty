@@ -36,7 +36,7 @@ func createTable(db *sql.DB) error {
         CigWeeklyUsage INT NOT NULL,
         Goal INT NOT NULL,
         GoalDeadline DATE NOT NULL,
-	WeeklySpending DECIMAL(3,2) NOT NULL,
+	WeeklySpending DECIMAL(5,2) NOT NULL,
         PRIMARY KEY (UserID)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
     `
@@ -98,7 +98,7 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 	query := `
 		INSERT INTO Users 
 		(Username, Password, Snus, SnusWeeklyUsage, SnusStrength, Vape, VapeWeeklyUsage, VapeStrength, Cigarette, CigWeeklyUsage, Goal, GoalDeadline, WeeklySpending)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
 	stmt, err := c.client.Prepare(query)
 	if err != nil {
@@ -120,7 +120,7 @@ func (c *MySQLClient) AddUser(n models.UserData) error {
 		n.CigWeeklyUsage,
 		n.Goal,
 		n.GoalDeadline,
-		n.WeeklySpending
+		n.WeeklySpending,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to execute statement: %v", err)
@@ -160,7 +160,7 @@ func (c *MySQLClient) AuthenticateUser(user models.UserData) (models.UserData, e
 		&user.CigWeeklyUsage,
 		&user.Goal,
 		&user.GoalDeadline,
-		&user.WeeklySpending
+		&user.WeeklySpending,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
 
 
 class ConsumptionEntry {
@@ -113,41 +112,9 @@ Future<int> getUserId() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   int? userId = prefs.getInt("user_id");
   if (userId == null) {
-    debugPrint("Error loading user ID");
+    print("Error loading user ID");
     return userId = -1;
   }
-
-  debugPrint("User ID: $userId.toString()");
+  print("User ID: $userId.toString()");
   return userId;
 }
-/*
-Future<UserDataEntry> fetchUserData({required int userID}) async {
-  const String apiBaseUrl = "http://34.105.133.181:8080";
-
-  final request = http.Request(
-    'GET',
-    Uri.parse("$apiBaseUrl/user/signup"),
-  )
-    ..headers['Content-Type'] = 'application/json'
-    ..headers['Accept'] = 'application/json'
-    ..body = jsonEncode({
-      "user_id": userID,
-      "start_date": startDate.toUtc().toIso8601String(),
-      "end_date": endDate.toUtc().toIso8601String(),
-    });
-
-  try {
-    final response = await http.Client().send(request);
-    final responseBody = await response.stream.bytesToString();
-
-    if (response.statusCode != 200) {
-      throw Exception("Failed to load data: ${response.statusCode}");
-    }
-
-    final List<dynamic> rawData = jsonDecode(responseBody);
-    return rawData.map((entry) => ConsumptionEntry.fromJson(entry)).toList();
-  } catch (e) {
-    // error, log maybe?
-    return [];
-  }
-}*/

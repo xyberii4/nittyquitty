@@ -22,6 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _cigaretteWeeklyUsageController = TextEditingController();
   final TextEditingController _goalController = TextEditingController();
   final TextEditingController _goalDeadlineController = TextEditingController();
+  final TextEditingController _weeklySpending = TextEditingController();
 
   bool _snusSelected = false;
   bool _vapeSelected = false;
@@ -42,6 +43,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         "cig_weekly_usage": int.tryParse(_cigaretteWeeklyUsageController.text) ?? 0,
         "goal": double.tryParse(_goalController.text) ?? 0.0,
         "goal_deadline": _goalDeadlineController.text,
+        "weekly_spending": double.tryParse(_weeklySpending.text) ?? 0.0,
       };
       
       // Convert format back into yyyy-mm-dd for the API request
@@ -64,6 +66,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final Uri url = Uri.parse('http://34.105.133.181:8080/user/signup');
 
       try {
+        print("response");
         final response = await http.post(
           url,
           headers: {'Content-Type': 'application/json'},
@@ -281,6 +284,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                   ),
                 const SizedBox(height: 24),
+
+                // weekly spending
+                TextFormField(
+                  controller: _weeklySpending,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: "Weekly Spending",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter your total weekly spending on nicotine products";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 8),
 
                 // Goal Input Field
                 TextFormField(
