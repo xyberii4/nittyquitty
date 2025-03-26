@@ -44,6 +44,13 @@ Future<void> attemptLogin(BuildContext context, String username, String password
         await prefs.setString("goal_deadline", data["goal_deadline"]);
         await prefs.setDouble("weekly_spending", (data["weekly_spending"] as num).toDouble());
 
+        // print out all preferences for debugging
+        final allKeys = prefs.getKeys();
+        for (String key in allKeys) {
+          final value = prefs.get(key);
+          print('$key: $value');
+        }
+
         if (!Navigator.canPop(context)) return;
         Navigator.pushReplacement(
           context,

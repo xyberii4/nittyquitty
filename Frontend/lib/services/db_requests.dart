@@ -133,9 +133,9 @@ Future<double> getWeeklySpending() async {
   print("Usage: $spending");
   return spending;
 }
-Future<double> getWeeklyUsage(String nicType) async {
+Future<int> getWeeklyUsage(String nicType) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  double? usage = prefs.getDouble("${nicType}_weekly_usage");
+  int? usage = prefs.getInt("${nicType}_weekly_usage");
   if (usage == null) {
     print("Error loading weekly $nicType usage");
     return -1;
