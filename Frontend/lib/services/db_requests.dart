@@ -11,6 +11,10 @@ class ConsumptionEntry {
   final double cost;
   final DateTime timestamp;
 
+  double calcNicotineUsage() {
+    return this.quantity * this.mg;
+  }
+
   ConsumptionEntry({
     required this.product,
     required this.userId,
@@ -73,10 +77,11 @@ class UserDataEntry {
 }
 
 Future<List<ConsumptionEntry>> fetchConsumptionData({
-  required int userID,
+  int userID = -1,
   required DateTime startDate,
   required DateTime endDate,
 }) async {
+  userID = await getUserId();
   const String apiBaseUrl = "http://34.105.133.181:8080";
 
   final request = http.Request(
