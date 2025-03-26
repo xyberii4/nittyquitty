@@ -39,6 +39,7 @@ type UserData struct {
 	CigWeeklyUsage  int     `json:"cig_weekly_usage"`
 	Goal            float64 `json:"goal"`
 	GoalDeadline    string  `json:"goal_deadline"`
+	WeeklySpending  float64 `json:"weekly_spending"`
 }
 
 func ParseStringtoTime(s string) time.Time {

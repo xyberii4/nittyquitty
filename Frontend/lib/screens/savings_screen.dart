@@ -26,34 +26,26 @@ class _SavingsScreenState extends State<SavingsScreen> {
     _updateSavings();
   }
 
-  Future<double> averageSavings(int userID, int duration) async {
+  /*Future<double> averageSavings(int userID, int duration) async {
     final now = DateTime.now();
-    List<ConsumptionEntry> recentData, oldData;
+    List<ConsumptionEntry> recentData = await fetchConsumptionData(userID: userID, startDate: now.subtract(Duration(days: duration)), endDate: now);
+    double avgSpent = await fetchWeeklyExpenditure(UserID: userID) / 7;
 
-    recentData = await fetchConsumptionData(userID: userID, startDate: now.subtract(Duration(days: duration)), endDate: now);
-    oldData = await fetchConsumptionData(userID: userID, startDate: now.subtract(Duration(days: 3*duration)), endDate: now);
+    if (recentData.isNotEmpty) {
 
-    if (oldData.isNotEmpty) {
-
-      double recentSpent = 0, oldSpent = 0;
+      double recentSpent = 0, avgSpent = 0;
       for (ConsumptionEntry entry in recentData) {
         recentSpent += entry.cost;
       }
-      for (ConsumptionEntry entry in oldData) {
-        oldSpent += entry.cost;
-      }
-      recentSpent /= recentData.length;
-      oldSpent /= oldData.length;
-
-      return (oldSpent - recentSpent) * duration;
+      return avgSpent * duration - recentSpent;
     }
     else {
-      return 0;
+      return avgSpent * duration;
     }
-  }
+  }*/
 
   Future<void> _updateSavings() async {
-    int userId = await getUserId();
+    /*int userId = await getUserId();
 
     /*
     final now = DateTime.now();
@@ -75,7 +67,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
     
     setState(() {
       _savingsAmount = tmpSavings;
-    });
+    });*/
   }
 
   @override
