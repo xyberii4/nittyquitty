@@ -24,8 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 2; // Default to 'Home'
   final NotiService notiService = NotiService(); // Notification service instance
 
-  late DateTime startDate, endDate;
-  late double initialIntake, targetIntake;
+  DateTime startDate = DateTime.now(), endDate = DateTime.now();
+  double initialIntake = 0, targetIntake = 0;
 
   @override
   void initState() {
