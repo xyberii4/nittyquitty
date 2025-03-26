@@ -33,17 +33,23 @@ class _SavingsScreenState extends State<SavingsScreen> {
     recentData = await fetchConsumptionData(userID: userID, startDate: now.subtract(Duration(days: duration)), endDate: now);
     oldData = await fetchConsumptionData(userID: userID, startDate: now.subtract(Duration(days: 3*duration)), endDate: now);
 
-    double recentSpent = 0, oldSpent = 0;
-    for (ConsumptionEntry entry in recentData) {
-      recentSpent += entry.cost;
-    }
-    for (ConsumptionEntry entry in oldData) {
-      oldSpent += entry.cost;
-    }
-    recentSpent /= recentData.length;
-    oldSpent /= oldData.length;
+    if (oldData.isNotEmpty) {
 
-    return (oldSpent - recentSpent) * duration;
+      double recentSpent = 0, oldSpent = 0;
+      for (ConsumptionEntry entry in recentData) {
+        recentSpent += entry.cost;
+      }
+      for (ConsumptionEntry entry in oldData) {
+        oldSpent += entry.cost;
+      }
+      recentSpent /= recentData.length;
+      oldSpent /= oldData.length;
+
+      return (oldSpent - recentSpent) * duration;
+    }
+    else {
+      return 0;
+    }
   }
 
   Future<void> _updateSavings() async {
