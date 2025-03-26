@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:nittyquitty/services/db_requests.dart';
 
 class CigarettesScreen extends StatefulWidget {
+  const CigarettesScreen({super.key});
+
   @override
   _CigarettesScreenState createState() => _CigarettesScreenState();
 }
