@@ -14,7 +14,7 @@ class NotiService {
   Timer? _smartTimer;
   int _lastMorningNotificationDay = -1;
   int _lastEveningNotificationDay = -1;
-  Set<int> _sentSmartHours = {};
+  final Set<int> _sentSmartHours = {};
   int _lastSmartNotificationDay = -1;
 
   final List<String> motivationalMessages = [
@@ -101,11 +101,11 @@ class NotiService {
 
     try {
       print('[NotiService] Making API request to: $apiBaseUrl/api/getConsumption');
-      print('[NotiService] Request payload: ' + jsonEncode({
+      print('[NotiService] Request payload: ${jsonEncode({
         "user_id": userId,
         "start_date": startDate,
         "end_date": endDate,
-      }));
+      })}');
 
       final request = http.Request('GET', Uri.parse("$apiBaseUrl/api/getConsumption"))
         ..headers['Content-Type'] = 'application/json'

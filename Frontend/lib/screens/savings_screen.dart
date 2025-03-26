@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:nittyquitty/services/db_requests.dart';
+import 'package:nittyquitty/services/db_requests.dart';
 
 enum Period {
   week,
@@ -26,14 +26,14 @@ class _SavingsScreenState extends State<SavingsScreen> {
     _updateSavings();
   }
 
-  /*Future<double> averageSavings(int userID, int duration) async {
+  Future<double> averageSavings(int userID, int duration) async {
     final now = DateTime.now();
     List<ConsumptionEntry> recentData = await fetchConsumptionData(userID: userID, startDate: now.subtract(Duration(days: duration)), endDate: now);
-    double avgSpent = await fetchWeeklyExpenditure(UserID: userID) / 7;
+    double avgSpent = await getWeeklySpending() / 7;
 
     if (recentData.isNotEmpty) {
 
-      double recentSpent = 0, avgSpent = 0;
+      double recentSpent = 0;
       for (ConsumptionEntry entry in recentData) {
         recentSpent += entry.cost;
       }
@@ -42,19 +42,11 @@ class _SavingsScreenState extends State<SavingsScreen> {
     else {
       return avgSpent * duration;
     }
-  }*/
+  }
 
   Future<void> _updateSavings() async {
-    /*int userId = await getUserId();
 
-    /*
-    final now = DateTime.now();
-    final nowUTC = now.toUtc();
-
-    List<ConsumptionEntry> recentData, oldData;
-    int expenditure;
-    */
-    
+    int userId = await getUserId();
     double tmpSavings;
     switch (_selectedPeriod) {
       case Period.week:
@@ -64,26 +56,26 @@ class _SavingsScreenState extends State<SavingsScreen> {
       case Period.year:
         tmpSavings = await averageSavings(userId, 365);
     }
-    
+
     setState(() {
       _savingsAmount = tmpSavings;
-    });*/
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // Transparent background for the screen
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text("SAVINGS SCREEN",
-        style: GoogleFonts.nunito( // Change to Montserrat, Roboto, or any other
-      fontSize: 28,
-      fontWeight: FontWeight.w600, // Medium-bold for professionalism
-      color: Colors.white,
+          style: GoogleFonts.nunito(
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
-        ),
-        centerTitle: true, // Centers the title for better alignment
-        backgroundColor: Colors.black.withOpacity(0.2), // Subtle transparency in the background
+        centerTitle: true,
+        backgroundColor: Colors.black.withOpacity(0.2),
         elevation: 2, // Adds a slight shadow for depth
         automaticallyImplyLeading: false, // Removes the default back button
       ),

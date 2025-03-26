@@ -30,10 +30,6 @@ class ConsumptionEntry {
       timestamp: DateTime.parse(json['timestamp']),
     );
   }
-
-  double calcNicotineUsage() {
-    return this.mg * this.quantity;
-  }
 }
 
 class UserDataEntry {
@@ -77,11 +73,10 @@ class UserDataEntry {
 }
 
 Future<List<ConsumptionEntry>> fetchConsumptionData({
-  int userID = -1,
+  required int userID,
   required DateTime startDate,
   required DateTime endDate,
 }) async {
-  if (userID == -1) userID = await getUserId();
   const String apiBaseUrl = "http://34.105.133.181:8080";
 
   final request = http.Request(
@@ -118,8 +113,48 @@ Future<int> getUserId() async {
   int? userId = prefs.getInt("user_id");
   if (userId == null) {
     print("Error loading user ID");
-    return userId = -1;
+    return -1;
   }
-  print("User ID: $userId.toString()");
+  print("User ID: $userId");
   return userId;
+}
+Future<double> getWeeklySpending() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  double? spending = prefs.getDouble("weekly_spending");
+  if (spending == null) {
+    print("Error loading weekly spending");
+    return -1;
+  }
+  print("Usage: $spending");
+  return spending;
+}
+Future<double> getWeeklyUsage(String nicType) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  double? usage = prefs.getDouble("${nicType}_weekly_usage");
+  if (usage == null) {
+    print("Error loading weekly $nicType usage");
+    return -1;
+  }
+  print("Usage: $usage");
+  return usage;
+}
+Future<double> getGoal() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  double? goal = prefs.getDouble("goal");
+  if (goal == null) {
+    print("Error loading goal");
+    return -1;
+  }
+  print("Usage: $goal");
+  return goal;
+}
+Future<DateTime> getGoalDeadline() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? goalDeadline = prefs.getString("goalDeadline");
+  if (goalDeadline == null) {
+    print("Error loading goalDeadline");
+    return DateTime.now();
+  }
+  print("Usage: $goalDeadline");
+  return DateTime.parse(goalDeadline);
 }

@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:nittyquitty/services/db_requests.dart';
 
 class CustomScreen extends StatefulWidget {
+  const CustomScreen({super.key});
+
   @override
   _CustomScreenState createState() => _CustomScreenState();
 }

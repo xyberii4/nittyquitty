@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:nittyquitty/noti_service.dart';
+import 'package:nittyquitty/services/db_requests.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/goal_generator.dart';
 import 'savings_screen.dart';
 import 'input_nic_screen.dart';
 import 'analytics_screen.dart';
@@ -21,10 +24,21 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 2; // Default to 'Home'
   final NotiService notiService = NotiService(); // Notification service instance
 
+  late DateTime startDate, endDate;
+  late double initialIntake, targetIntake;
+
   @override
   void initState() {
     super.initState();
     _initializeApp();
+    fetchData();
+  }
+
+  void fetchData() async {
+    startDate = DateTime.now();
+    endDate = await getGoalDeadline();
+    initialIntake = await getWeeklyUsage("snus") + await getWeeklyUsage("vape") + await getWeeklyUsage("cig");
+    targetIntake = await getGoal();
   }
 
   Future<void> _initializeApp() async {
@@ -76,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fit: BoxFit.cover,
             ),
           ),
+          generateGoalChart(context),
           Center(child: _pages[_selectedIndex]),
         ],
       ),
@@ -90,6 +105,54 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.assessment), label: 'Analytics'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Community'),
         ],
+      ),
+    );
+  }
+  Widget generateGoalChart(BuildContext context) {
+    List<FlSpot> goalData = generateNicotineGoals(
+      startDate,
+      endDate,
+      initialIntake,
+      targetIntake,
+    );
+    return SizedBox(
+      height: 300,
+      child: LineChart(
+        LineChartData(
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  int index = value.toInt();
+                  if (index % 5 == 0) {
+                    return Text('${index}d');
+                  }
+                  return const SizedBox.shrink();
+                },
+                reservedSize: 30,
+              ),
+            ),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
+          borderData: FlBorderData(show: false),
+          gridData: FlGridData(show: false),
+          lineBarsData: [
+            LineChartBarData(
+              spots: goalData,
+              isCurved: true,
+              color: Colors.green,
+              barWidth: 4,
+              isStrokeCapRound: true,
+              belowBarData: BarAreaData(show: false),
+              dotData: FlDotData(show: false),
+            ),
+          ],
+        ),
       ),
     );
   }

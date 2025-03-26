@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:nittyquitty/services/db_requests.dart';
 
 class SnusScreen extends StatefulWidget {
+  const SnusScreen({super.key});
+
   @override
   _SnusScreenState createState() => _SnusScreenState();
 }
