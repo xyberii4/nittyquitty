@@ -101,8 +101,8 @@ double computeNextDayTarget(Map<DateTime, double> dailyTotals, {int daysLookback
 List<FlSpot> generateNicotineGoals(
     DateTime startDate,
     DateTime endDate,
-    double initialIntake,
-    double targetIntake,
+    int initialIntake,
+    int targetIntake,
     ) {
 
   int totalDays = endDate.difference(startDate).inDays;

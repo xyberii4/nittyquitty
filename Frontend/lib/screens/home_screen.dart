@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final NotiService notiService = NotiService(); // Notification service instance
 
   DateTime startDate = DateTime.now(), endDate = DateTime.now();
-  double initialIntake = 0, targetIntake = 0;
+  int initialIntake = 0, targetIntake = 0;
 
   @override
   void initState() {
@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
     startDate = DateTime.now();
     endDate = await getGoalDeadline();
     initialIntake = await getWeeklyUsage("snus") + await getWeeklyUsage("vape") + await getWeeklyUsage("cig");
-    targetIntake = await getGoal();
+    targetIntake = (await getGoal()).toInt();
   }
 
   Future<void> _initializeApp() async {
