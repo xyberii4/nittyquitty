@@ -23,7 +23,7 @@ Future<void> attemptLogin(BuildContext context, String username, String password
     if (response.statusCode == 200) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool("notificationsEnabled", true);
-      await prefs.setBool("staySignedIn", false);
+      await prefs.setBool("staySignedIn", true);
 
       final data = jsonDecode(response.body);
       print(data);

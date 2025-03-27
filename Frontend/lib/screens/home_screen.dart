@@ -113,7 +113,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   bool _dataFetched = false;
   DateTime startDate = DateTime.now();
   late DateTime endDate;
-  late int initialIntake;
+  late double initialIntake;
   late double targetIntake;
 
   @override
@@ -130,9 +130,10 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   Future<void> fetchData() async {
     startDate = DateTime.now();
     endDate = await getGoalDeadline();
-    initialIntake =
-        await getWeeklyUsage("snus") + await getWeeklyUsage("vape") +
-            await getWeeklyUsage("cig");
+    initialIntake = (
+            await getWeeklyUsage("snus") +
+            await getWeeklyUsage("vape") +
+            await getWeeklyUsage("cig")) / 7;
     targetIntake = await getGoal();
     print("[FETCHDATA] startDate: $startDate");
     print("[FETCHDATA] endDate: $endDate");
@@ -236,6 +237,8 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
               height: 250,
               child: LineChart(
                 LineChartData(
+                  minY: 0,
+                  maxY: initialIntake-(initialIntake%10)+20,
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
@@ -274,6 +277,23 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
                       dotData: FlDotData(show: false),
                     ),
                   ],
+                  extraLinesData: ExtraLinesData(
+                    horizontalLines: [
+                      HorizontalLine(
+                        y: double.parse(recentData.replaceAll(" mg", "")),
+                        color: Colors.red,
+                        dashArray: [5, 5],
+                        label: HorizontalLineLabel(
+                          labelResolver: (line) => "Recent Intake",
+                          show: true,
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

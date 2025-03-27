@@ -99,7 +99,7 @@ double computeNextDayTarget(Map<DateTime, double> dailyTotals, {int daysLookback
 List<FlSpot> generateNicotineGoals(
     DateTime startDate,
     DateTime endDate,
-    int initialIntake,
+    double initialIntake,
     double targetIntake,
     ) {
 
