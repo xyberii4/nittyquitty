@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nittyquitty/services/db_requests.dart';
+import 'package:nittyquitty/services/user_prefs.dart';
 
 enum Period {
   week,
@@ -28,20 +29,24 @@ class _SavingsScreenState extends State<SavingsScreen> {
 
   Future<double> averageSavings(int userID, int duration) async {
     final now = DateTime.now();
-    List<ConsumptionEntry> recentData = await fetchConsumptionData(userID: userID, startDate: now.subtract(Duration(days: duration)), endDate: now);
+    List<ConsumptionEntry> recentData = await fetchConsumptionData(user_id: userID, startDate: now.subtract(Duration(days: duration)), endDate: now);
     double avgSpent = await getWeeklySpending() / 7;
 
-    if (recentData.isNotEmpty) {
+    double averageSavings = 0.0;
 
+    if (recentData.isNotEmpty) {
       double recentSpent = 0;
       for (ConsumptionEntry entry in recentData) {
         recentSpent += entry.cost;
       }
-      return avgSpent * duration - recentSpent;
+      averageSavings = avgSpent * duration - recentSpent;
     }
     else {
-      return avgSpent * duration;
+      averageSavings = avgSpent * duration;
     }
+
+    print("averageSavings: $averageSavings");
+    return averageSavings;
   }
 
   Future<void> _updateSavings() async {

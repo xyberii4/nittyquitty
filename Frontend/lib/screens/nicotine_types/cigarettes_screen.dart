@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:nittyquitty/screens/nicotine_types/input_nic_functions.dart';
 import 'dart:convert';
-import 'package:nittyquitty/services/db_requests.dart';
+import 'package:nittyquitty/services/user_prefs.dart';
 
 class CigarettesScreen extends StatefulWidget {
   const CigarettesScreen({super.key});
@@ -53,6 +53,7 @@ class _CigarettesScreenState extends State<CigarettesScreen> {
       body: jsonBody,
     );
 
+    print(jsonBody);
     // Check if the request was successful
     if (response.statusCode == 200) {
       // Show success message

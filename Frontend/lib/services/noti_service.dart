@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'db_requests.dart';
+import 'package:nittyquitty/services/user_prefs.dart';
 
 class NotiService {
   final FlutterLocalNotificationsPlugin notificationPlugin =

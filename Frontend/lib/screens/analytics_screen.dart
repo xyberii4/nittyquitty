@@ -43,19 +43,23 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final today = DateTime(now.year, now.month, now.day);
 
     // currently just random data, but need to connect to database
+    print("Start Fetching Data");
     switch (_selectedPeriod) {
       case Period.day:
         List<ConsumptionEntry> entries = await fetchConsumptionData(startDate: today, endDate: today.add(const Duration(days: 1)));
+        print("Fetched Day Data");
         _barData = List.filled(24, 0.0);
 
         for (var entry in entries) {
           final hour = entry.timestamp.hour;
           double tmp = entry.calcNicotineUsage();
           _barData[hour] += tmp;
+          entry.debugEntry();
         }
         _xLabels = [];
-
-        print(entries);
+        
+        int tmp = entries.length;
+        print("no. of entries: $tmp");
         print(_barData);
         print(_xLabels);
 

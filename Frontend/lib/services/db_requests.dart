@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:nittyquitty/screens/nicotine_types/input_nic_functions.dart';
+import 'package:nittyquitty/services/user_prefs.dart';
 
 class ConsumptionEntry {
   final String product;
@@ -11,6 +11,9 @@ class ConsumptionEntry {
   final double cost;
   final DateTime timestamp;
 
+  void debugEntry() {
+    print("user_id: $userId, product: $product, mg: $mg, quantity: $quantity, cost: $cost, timestamp: $timestamp");
+  }
   double calcNicotineUsage() {
     return this.quantity * this.mg;
   }
@@ -25,6 +28,9 @@ class ConsumptionEntry {
   });
 
   factory ConsumptionEntry.fromJson(Map<String, dynamic> json) {
+    print("Factory Debug");
+    print(json);
+
     return ConsumptionEntry(
       product: json['product'],
       userId: json['user_id'],
@@ -77,24 +83,29 @@ class UserDataEntry {
 }
 
 Future<List<ConsumptionEntry>> fetchConsumptionData({
-  int userID = -1,
+  int user_id = -1,
   required DateTime startDate,
   required DateTime endDate,
 }) async {
-  userID = await getUserId();
-  const String apiBaseUrl = "http://34.105.133.181:8080";
 
+  if (user_id == -1) user_id = await getUserId();
+
+  String requestBody = jsonEncode({
+    "user_id": user_id,
+    "start_date": startDate.toUtc().toIso8601String(),
+    "end_date": endDate.toUtc().toIso8601String(),
+  });
+
+  print(requestBody);
+
+  const String apiBaseUrl = "http://34.105.133.181:8080";
   final request = http.Request(
     'GET',
     Uri.parse("$apiBaseUrl/api/getConsumption"),
   )
     ..headers['Content-Type'] = 'application/json'
     ..headers['Accept'] = 'application/json'
-    ..body = jsonEncode({
-      "user_id": userID,
-      "start_date": startDate.toUtc().toIso8601String(),
-      "end_date": endDate.toUtc().toIso8601String(),
-    });
+    ..body = requestBody;
 
   try {
     final response = await http.Client().send(request);
@@ -112,54 +123,49 @@ Future<List<ConsumptionEntry>> fetchConsumptionData({
   }
 }
 
-// returns userId, or -1 if an error has occured
-Future<int> getUserId() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  int? userId = prefs.getInt("user_id");
-  if (userId == null) {
-    print("Error loading user ID");
-    return -1;
+Future<bool> logConsumption({
+  required String product,
+  int user_id = -1,
+  required double mg,
+  required int quantity,
+  required double cost,
+  required DateTime timestamp,
+}) async {
+
+  if (user_id == -1) user_id = await getUserId();
+
+  String  requestBody = jsonEncode({
+    "product": product,
+    "user_id": user_id,
+    "mg": mg,
+    "quantity": quantity,
+    "cost": cost,
+    "timestamp": timeToISO(timestamp),
+  });
+
+  print(requestBody);
+
+  const String apiBaseUrl = "http://34.105.133.181:8080";
+  final request = http.Request(
+    'GET',
+    Uri.parse("$apiBaseUrl/api/logConsumption"),
+  )
+    ..headers['Content-Type'] = 'application/json'
+    ..headers['Accept'] = 'application/json'
+    ..body = requestBody;
+
+  try {
+    final response = await http.Client().send(request);
+ // final responseBody = await response.stream.bytesToString();
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to load data: ${response.statusCode}");
+    }
+
+    return true;
+
+  } catch (e) {
+    // error, log maybe?
+    return false;
   }
-  print("User ID: $userId");
-  return userId;
-}
-Future<double> getWeeklySpending() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  double? spending = prefs.getDouble("weekly_spending");
-  if (spending == null) {
-    print("Error loading weekly spending");
-    return -1;
-  }
-  print("Usage: $spending");
-  return spending;
-}
-Future<int> getWeeklyUsage(String nicType) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  int? usage = prefs.getInt("${nicType}_weekly_usage");
-  if (usage == null) {
-    print("Error loading weekly $nicType usage");
-    return -1;
-  }
-  print("Usage: $usage");
-  return usage;
-}
-Future<double> getGoal() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  double? goal = prefs.getDouble("goal");
-  if (goal == null) {
-    print("Error loading goal");
-    return -1;
-  }
-  print("Usage: $goal");
-  return goal;
-}
-Future<DateTime> getGoalDeadline() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? goalDeadline = prefs.getString("goalDeadline");
-  if (goalDeadline == null) {
-    print("Error loading goalDeadline");
-    return DateTime.now();
-  }
-  print("Usage: $goalDeadline");
-  return DateTime.parse(goalDeadline);
 }

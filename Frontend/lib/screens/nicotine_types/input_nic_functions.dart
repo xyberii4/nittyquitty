@@ -1,4 +1,6 @@
 String timeToISO(DateTime? dateTime) {
   dateTime ??= DateTime.now();
-  return dateTime.toIso8601String();
+  String iso = dateTime.toIso8601String();
+  print(iso);
+  return iso;
 }

@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:nittyquitty/services/noti_service.dart';
 import 'package:nittyquitty/services/db_requests.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nittyquitty/services/user_prefs.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/goal_generator.dart';
 import 'savings_screen.dart';
@@ -182,7 +180,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     const duration = 7;
 
     final recentList = await fetchConsumptionData(
-      userID: await getUserId(),
+      user_id: await getUserId(),
       startDate: now.subtract(const Duration(days: duration)),
       endDate: now,
     );
