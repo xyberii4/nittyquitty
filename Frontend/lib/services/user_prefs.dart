@@ -23,7 +23,7 @@ Future<double> getWeeklySpending() async {
   return spending;
 }
 
-Future<int> getWeeklyUsage(String nicType) async {
+Future<double> getWeeklyUsage(String nicType) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   int? usage = prefs.getInt("${nicType}_weekly_usage");
   if (usage == null) {
@@ -33,8 +33,13 @@ Future<int> getWeeklyUsage(String nicType) async {
   print("Weekly $nicType Usage: $usage");
   if (nicType == "cig") {
     return usage * 10;
+  }
+  int? strength = prefs.getInt("${nicType}_strength");
+  if (strength == null) {
+    print("Error loading $nicType strength");
+    return -1;
   } else {
-    return usage * prefs.getInt("${nicType}_strength")!;
+    return usage * strength/200;
   }
 }
 
