@@ -109,10 +109,10 @@ List<FlSpot> generateNicotineGoals(
   if (totalDays <= 0 || initialIntake <= targetIntake) {
     return [FlSpot.zero];
   }
-  double k = -math.log(initialIntake - targetIntake) / totalDays;
+  double k = math.log(initialIntake - targetIntake) / totalDays;
   for (int day = 0; day <= totalDays; day++) {
     double intake = targetIntake + (initialIntake - targetIntake) * math.exp(-k * day);
     goals.add(FlSpot(day.toDouble(), intake));
   }
-  return goals;
+  return goals.reversed.toList();
 }

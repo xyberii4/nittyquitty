@@ -19,7 +19,7 @@ Future<double> getWeeklySpending() async {
     print("Error loading weekly spending");
     return -1;
   }
-  print("Usage: $spending");
+  print("Weekly Spending: $spending");
   return spending;
 }
 
@@ -30,8 +30,12 @@ Future<int> getWeeklyUsage(String nicType) async {
     print("Error loading weekly $nicType usage");
     return -1;
   }
-  print("Usage: $usage");
-  return usage;
+  print("Weekly $nicType Usage: $usage");
+  if (nicType == "cig") {
+    return usage * 10;
+  } else {
+    return usage * prefs.getInt("${nicType}_strength")!;
+  }
 }
 
 Future<double> getGoal() async {
@@ -41,15 +45,15 @@ Future<double> getGoal() async {
     print("Error loading goal");
     return -1;
   }
-  print("Usage: $goal");
+  print("Goal: $goal");
   return goal;
 }
 
 Future<DateTime> getGoalDeadline() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? goalDeadline = prefs.getString("goalDeadline");
+  String? goalDeadline = prefs.getString("goal_deadline");
   if (goalDeadline == null) {
-    print("Error loading goalDeadline");
+    print("goal_deadline was null");
     return DateTime.now();
   }
   print("Usage: $goalDeadline");

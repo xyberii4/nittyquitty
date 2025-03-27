@@ -15,7 +15,7 @@ class ConsumptionEntry {
     print("user_id: $userId, product: $product, mg: $mg, quantity: $quantity, cost: $cost, timestamp: $timestamp");
   }
   double calcNicotineUsage() {
-    return this.quantity * this.mg;
+    return quantity * mg;
   }
 
   ConsumptionEntry({
