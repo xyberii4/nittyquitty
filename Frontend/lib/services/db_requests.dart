@@ -3,6 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:nittyquitty/screens/nicotine_types/input_nic_functions.dart';
 import 'package:nittyquitty/services/user_prefs.dart';
 
+enum DataType {
+  nicotine,
+  spending,
+}
+
 class ConsumptionEntry {
   final String product;
   final int userId;
@@ -15,9 +20,18 @@ class ConsumptionEntry {
     print("user_id: $userId, product: $product, mg: $mg, quantity: $quantity, cost: $cost, timestamp: $timestamp");
   }
   double calcNicotineUsage() {
-    return quantity * mg;
+    debugEntry();
+    return this.quantity * this.mg;
   }
-
+  double getNicotineOrSpending(DataType type) {
+    if (type == DataType.nicotine) {
+      return calcNicotineUsage();
+    }
+    else {
+      return cost;
+    }
+  } 
+  
   ConsumptionEntry({
     required this.product,
     required this.userId,
