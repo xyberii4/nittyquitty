@@ -92,8 +92,8 @@ Future<List<ConsumptionEntry>> fetchConsumptionData({
 
   String requestBody = jsonEncode({
     "user_id": user_id,
-    "start_date": startDate.toUtc().toIso8601String(),
-    "end_date": endDate.toUtc().toIso8601String(),
+    "start_date": timeToISO(startDate),
+    "end_date": timeToISO(endDate),
   });
 
   print(requestBody);
@@ -129,10 +129,11 @@ Future<bool> logConsumption({
   required double mg,
   required int quantity,
   required double cost,
-  required DateTime timestamp,
+  required DateTime? timestamp,
 }) async {
 
   if (user_id == -1) user_id = await getUserId();
+  timestamp ??= DateTime.now();
 
   String  requestBody = jsonEncode({
     "product": product,
@@ -147,7 +148,7 @@ Future<bool> logConsumption({
 
   const String apiBaseUrl = "http://34.105.133.181:8080";
   final request = http.Request(
-    'GET',
+    'POST',
     Uri.parse("$apiBaseUrl/api/logConsumption"),
   )
     ..headers['Content-Type'] = 'application/json'

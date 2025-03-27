@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:nittyquitty/screens/nicotine_types/input_nic_functions.dart';
-import 'dart:convert';
-import 'package:nittyquitty/services/user_prefs.dart';
+import 'package:nittyquitty/services/db_requests.dart';
 
 class SnusScreen extends StatefulWidget {
   const SnusScreen({super.key});
@@ -12,54 +10,19 @@ class SnusScreen extends StatefulWidget {
 }
 
 class _SnusScreenState extends State<SnusScreen> {
-  final _formKey = GlobalKey<FormState>(); // Key for the form
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _timeController = TextEditingController();
 
-  int _portions = 0; // Number of snus portions
-  String _strength = "1 dot"; // Strength (Dropdown)
-  double _cost = 0.0; // Cost
-  DateTime? _selectedTime; // User-entered time
+  int _portions = 0;
+  String _strength = "1 dot";
+  double _cost = 0.0;
+  DateTime? _selectedTime;
 
-  // Function to validate time input
-  bool _isValidTime(String input) {
-    final RegExp timeRegex = RegExp(r'^(?:[01]?\d|2[0-3]):[0-5]\d$'); // Matches 00:00 - 23:59
-    return timeRegex.hasMatch(input);
-  }
-
-  // Function to log consumption data to the backend
   Future<void> _logConsumption() async {
-    if (_selectedTime == null) {
-      // Ensure time is selected
-      return;
-    }
+    if (_selectedTime == null) return;
+    bool successful = await logConsumption(product: "snus", mg: _convertStrengthToMg(), quantity: _portions, cost: _cost, timestamp: _selectedTime);
 
-    // Convert strength to mg (example conversion)
-    double mg = _convertStrengthToMg(_strength);
-
-    // Prepare the request body
-    final Map<String, dynamic> requestBody = {
-      "product": "snus",
-      "user_id": await getUserId(), // Replace with the actual user ID
-      "mg": mg,
-      "quantity": _portions,
-      "cost": _cost,
-      "timestamp": timeToISO(_selectedTime),
-    };
-
-    // Convert the request body to JSON
-    final String jsonBody = json.encode(requestBody);
-
-    // Make the POST request
-    final Uri url = Uri.parse('http://34.105.133.181:8080/api/logConsumption');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonBody,
-    );
-
-    // Check if the request was successful
-    if (response.statusCode == 200) {
-      // Show success message
+    if (successful) {
       showDialog(
         context: context,
         builder: (context) {
@@ -79,7 +42,6 @@ class _SnusScreenState extends State<SnusScreen> {
         },
       );
     } else {
-      // Show error message
       showDialog(
         context: context,
         builder: (context) {
@@ -100,9 +62,8 @@ class _SnusScreenState extends State<SnusScreen> {
     }
   }
 
-  // Function to convert strength to mg (example logic)
-  double _convertStrengthToMg(String strength) {
-    switch (strength) {
+  double _convertStrengthToMg() {
+    switch (_strength) {
       case '1 dot':
         return 4.0;
       case '2 dot':
@@ -135,7 +96,6 @@ class _SnusScreenState extends State<SnusScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Input for the number of snus portions
                 TextFormField(
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
@@ -156,7 +116,6 @@ class _SnusScreenState extends State<SnusScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // User enters time manually
                 TextFormField(
                   controller: _timeController,
                   keyboardType: TextInputType.datetime,
@@ -165,7 +124,7 @@ class _SnusScreenState extends State<SnusScreen> {
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (value) {
-                    if (_isValidTime(value)) {
+                    if (isValidTime(value)) {
                       List<String> parts = value.split(":");
                       int hour = int.parse(parts[0]);
                       int minute = int.parse(parts[1]);
@@ -182,7 +141,7 @@ class _SnusScreenState extends State<SnusScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a valid time';
                     }
-                    if (!_isValidTime(value)) {
+                    if (!isValidTime(value)) {
                       return 'Invalid time format. Use HH:MM (24-hour format)';
                     }
                     return null;
@@ -190,7 +149,6 @@ class _SnusScreenState extends State<SnusScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Dropdown for strength selection
                 DropdownButtonFormField<String>(
                   value: _strength,
                   decoration: InputDecoration(
@@ -217,7 +175,6 @@ class _SnusScreenState extends State<SnusScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Input for the cost of the snus
                 TextFormField(
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
@@ -238,11 +195,9 @@ class _SnusScreenState extends State<SnusScreen> {
                 ),
                 SizedBox(height: 24),
 
-                // Submit button
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState?.validate() ?? false) {
-                      // Log consumption data to the backend
                       _logConsumption();
                     }
                   },

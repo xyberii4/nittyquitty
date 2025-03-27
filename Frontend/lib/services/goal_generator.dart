@@ -1,8 +1,6 @@
 import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 
-import 'db_requests.dart';
-
 /*
 import 'db_requests.dart';
 void main() async {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'nicotine_types/vapes_screen.dart';      // Import from subfolder
+import 'nicotine_types/vape_screen.dart';      // Import from subfolder
 import 'nicotine_types/cigarettes_screen.dart';
 import 'nicotine_types/snus_screen.dart';
 import 'nicotine_types/custom_screen.dart';

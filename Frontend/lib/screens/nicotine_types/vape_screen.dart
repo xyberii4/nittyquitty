@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:nittyquitty/screens/nicotine_types/input_nic_functions.dart';
-import 'dart:convert';
-import 'package:nittyquitty/services/user_prefs.dart';
+import 'package:nittyquitty/services/db_requests.dart';
 
 class VapesScreen extends StatefulWidget {
   const VapesScreen({super.key});
@@ -12,50 +10,20 @@ class VapesScreen extends StatefulWidget {
 }
 
 class _VapesScreenState extends State<VapesScreen> {
-  final _formKey = GlobalKey<FormState>(); // Key for the form
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _timeController = TextEditingController();
 
-  int _puffs = 0; // Number of puffs
-  double _mg = 0.0; // Mg of nicotine
-  double _cost = 0.0; // Cost
-  DateTime? _selectedTime; // User-entered time
+  int _puffs = 0;
+  double _mg = 0.0;
+  double _cost = 0.0;
+  DateTime? _selectedTime;
 
-  // Function to validate time input
-  bool _isValidTime(String input) {
-    final RegExp timeRegex = RegExp(r'^(?:[01]?\d|2[0-3]):[0-5]\d$'); // Matches 00:00 - 23:59
-    return timeRegex.hasMatch(input);
-  }
-
-  // Function to log consumption data to the backend
   Future<void> _logConsumption() async {
-    if (_selectedTime == null) {
-      // Ensure time is selected
-      return;
-    }
-
-    // Prepare the request body
-    final Map<String, dynamic> requestBody = {
-      "product": "vape",
-      "user_id": await getUserId(), // Replace with the actual user ID
-      "mg": _mg,
-      "quantity": _puffs,
-      "cost": _cost,
-      "timestamp": timeToISO(_selectedTime),
-    };
-
-    // Convert the request body to JSON
-    final String jsonBody = json.encode(requestBody);
-
-    // Make the POST request
-    final Uri url = Uri.parse('http://34.105.133.181:8080/api/logConsumption');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonBody,
-    );
+    if (_selectedTime == null) return;
+    bool successful = await logConsumption(product: "vape", mg: _mg, quantity: _puffs, cost: _cost, timestamp: _selectedTime);
 
     // Check if the request was successful
-    if (response.statusCode == 200) {
+    if (successful) {
       // Show success message
       showDialog(
         context: context,
@@ -76,7 +44,6 @@ class _VapesScreenState extends State<VapesScreen> {
         },
       );
     } else {
-      // Show error message
       showDialog(
         context: context,
         builder: (context) {
@@ -112,7 +79,6 @@ class _VapesScreenState extends State<VapesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Input for the number of puffs
                 TextFormField(
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
@@ -133,7 +99,6 @@ class _VapesScreenState extends State<VapesScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Time input
                 TextFormField(
                   controller: _timeController,
                   keyboardType: TextInputType.datetime,
@@ -142,7 +107,7 @@ class _VapesScreenState extends State<VapesScreen> {
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (value) {
-                    if (_isValidTime(value)) {
+                    if (isValidTime(value)) {
                       List<String> parts = value.split(":");
                       int hour = int.parse(parts[0]);
                       int minute = int.parse(parts[1]);
@@ -159,7 +124,7 @@ class _VapesScreenState extends State<VapesScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a valid time';
                     }
-                    if (!_isValidTime(value)) {
+                    if (!isValidTime(value)) {
                       return 'Invalid time format. Use HH:MM (24-hour format)';
                     }
                     return null;
@@ -167,7 +132,6 @@ class _VapesScreenState extends State<VapesScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Input for the nicotine strength in mg
                 TextFormField(
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
@@ -188,7 +152,6 @@ class _VapesScreenState extends State<VapesScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Input for the cost of the vape
                 TextFormField(
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
@@ -209,11 +172,9 @@ class _VapesScreenState extends State<VapesScreen> {
                 ),
                 SizedBox(height: 24),
 
-                // Submit button
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState?.validate() ?? false) {
-                      // Log consumption data to the backend
                       _logConsumption();
                     }
                   },
