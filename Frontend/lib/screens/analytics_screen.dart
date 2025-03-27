@@ -71,71 +71,82 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final today = DateTime(now.year, now.month, now.day);
 
     switch (_selectedPeriod) {
-      case Period.day: {
-        final entries = await fetchConsumptionData(
-          startDate: today,
-          endDate: today.add(const Duration(days: 1)),
-        );
-        _barData = List.filled(24, 0.0);
-        _xLabels = getFilteredXLabels(Period.day, 4);
+      case Period.day:
+        {
+          final entries = await fetchConsumptionData(
+            startDate: today,
+            endDate: today.add(const Duration(days: 1)),
+          );
+          _barData = List.filled(24, 0.0);
+          _xLabels = getFilteredXLabels(Period.day, 4);
 
-        for (var entry in entries) {
-          _barData[entry.timestamp.hour] += entry.getNicotineOrSpending(_selectedDataType);
-        }
-        break;
-      }
-
-      case Period.week: {
-        final startDate = today.subtract(const Duration(days: 6));
-        final entries = await fetchConsumptionData(
-          startDate: startDate,
-          endDate: today.add(const Duration(days: 1)),
-        );
-        _barData = List.filled(7, 0.0);
-        _xLabels = getFilteredXLabels(Period.week, 2);
-
-        for (var entry in entries) {
-          final diff = entry.timestamp.difference(startDate).inDays;
-          if (diff >= 0 && diff < 7) {
-            _barData[diff] += entry.getNicotineOrSpending(_selectedDataType);
+          for (var entry in entries) {
+            if (entry.timestamp.isAfter(today) &&
+                entry.timestamp.isBefore(today.add(const Duration(days: 1)))) {
+              _barData[entry.timestamp.hour] +=
+                  entry.getNicotineOrSpending(_selectedDataType);
+            }
           }
+          break;
         }
-        break;
-      }
 
-      case Period.month: {
-        final startDate = today.subtract(const Duration(days: 29));
-        final entries = await fetchConsumptionData(
-          startDate: startDate,
-          endDate: today.add(const Duration(days: 1)),
-        );
-        _barData = List.filled(30, 0.0);
-        _xLabels = getFilteredXLabels(Period.month, 6);
+      case Period.week:
+        {
+          final startDate = today.subtract(const Duration(days: 6));
+          final entries = await fetchConsumptionData(
+            startDate: startDate,
+            endDate: today.add(const Duration(days: 1)),
+          );
+          _barData = List.filled(7, 0.0);
+          _xLabels = getFilteredXLabels(Period.week, 2);
 
-        for (var entry in entries) {
-          final diff = entry.timestamp.difference(startDate).inDays;
-          if (diff >= 0 && diff < 30) {
-            _barData[diff] += entry.getNicotineOrSpending(_selectedDataType);
+          for (var entry in entries) {
+            final diff = entry.timestamp.difference(startDate).inDays;
+            if (diff >= 0 && diff < 7) {
+              _barData[diff] += entry.getNicotineOrSpending(_selectedDataType);
+            }
           }
+          break;
         }
-        break;
-      }
 
-      case Period.year: {
-        final startDate = DateTime(today.year - 1, today.month, today.day);
-        final entries = await fetchConsumptionData(
-          startDate: startDate,
-          endDate: today.add(const Duration(days: 1)),
-        );
-        _barData = List.filled(12, 0.0);
-        _xLabels = getFilteredXLabels(Period.year, 1);
+      case Period.month:
+        {
+          final startDate = today.subtract(const Duration(days: 29));
+          final entries = await fetchConsumptionData(
+            startDate: startDate,
+            endDate: today.add(const Duration(days: 1)),
+          );
+          _barData = List.filled(30, 0.0);
+          _xLabels = getFilteredXLabels(Period.month, 6);
 
-        for (var entry in entries) {
-          final monthIndex = (entry.timestamp.month - startDate.month + 12) % 12;
-          _barData[monthIndex] += entry.getNicotineOrSpending(_selectedDataType);
+          for (var entry in entries) {
+            final diff = entry.timestamp.difference(startDate).inDays;
+            if (diff >= 0 && diff < 30) {
+              _barData[diff] += entry.getNicotineOrSpending(_selectedDataType);
+            }
+          }
+          break;
         }
-        break;
-      }
+
+      case Period.year:
+        {
+          final startDate = DateTime(today.year - 1, today.month, today.day);
+          final entries = await fetchConsumptionData(
+            startDate: startDate,
+            endDate: today.add(const Duration(days: 1)),
+          );
+          _barData = List.filled(12, 0.0);
+          _xLabels = getFilteredXLabels(Period.year, 1);
+
+          for (var entry in entries) {
+            final monthIndex = (entry.timestamp.year - startDate.year) * 12 +
+                              (entry.timestamp.month - startDate.month);
+            if (monthIndex >= 0 && monthIndex < 12) {
+              _barData[monthIndex] += entry.getNicotineOrSpending(_selectedDataType);
+            }
+          }
+          break;
+        }
     }
 
     if (!mounted) return;

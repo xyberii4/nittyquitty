@@ -101,7 +101,7 @@ Future<List<ConsumptionEntry>> fetchConsumptionData({
   required DateTime startDate,
   required DateTime endDate,
 }) async {
-
+  print("LOADING");
   if (user_id == -1) user_id = await getUserId();
 
   String requestBody = jsonEncode({
