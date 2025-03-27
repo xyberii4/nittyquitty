@@ -1,8 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'dart:math' as math;
 import 'package:nittyquitty/services/db_requests.dart';
+import 'package:nittyquitty/services/db_requests.dart' show DataType;
 
 enum Period {
   day,
@@ -10,9 +12,41 @@ enum Period {
   month,
   year,
 }
-enum DataType {
-  nicotine,
-  spending,
+
+final now = DateTime.now();
+
+final Map<Period, List<String>> xLabels = {
+  Period.day: List.generate(24, (i) {
+    final hour = i % 12 == 0 ? 12 : i % 12;
+    final period = i < 12 ? "am" : "pm";
+    return "$hour:00$period";
+  }),
+
+  Period.week: () {
+    final weekdayToday = now.weekday;
+    final List<String> allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    return List.generate(7, (i) => allDays[(weekdayToday + i) % 7]);
+  }(),
+
+  Period.month: () {
+    final dateFormat = DateFormat('d MMM');
+    return List.generate(30, (i) {
+      final date = now.subtract(Duration(days: 29 - i));
+      return dateFormat.format(date);
+    });
+  }(),
+
+  Period.year: () {
+    final months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    final currentMonth = now.month; // 1–12
+    return List.generate(12, (i) => months[(currentMonth + i) % 12]);
+  }(),
+};
+List<String> getFilteredXLabels(Period period, int step) {
+  final List<String> list = xLabels[period] ?? [];
+  return List.generate(list.length, (i) {
+    return i % step == 0 ? list[i] : '';
+  });
 }
 
 class AnalyticsScreen extends StatefulWidget {
@@ -29,12 +63,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   List<double> _barData = [];
   List<String> _xLabels = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchChartData();
-  }
-
   Future<void> _fetchChartData() async {
     _barData = [];
     _xLabels = [];
@@ -42,63 +70,74 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // currently just random data, but need to connect to database
-    print("Start Fetching Data");
     switch (_selectedPeriod) {
-      case Period.day:
-        List<ConsumptionEntry> entries = await fetchConsumptionData(startDate: today, endDate: today.add(const Duration(days: 1)));
-        print("Fetched Day Data");
+      case Period.day: {
+        final entries = await fetchConsumptionData(
+          startDate: today,
+          endDate: today.add(const Duration(days: 1)),
+        );
         _barData = List.filled(24, 0.0);
+        _xLabels = getFilteredXLabels(Period.day, 4);
 
         for (var entry in entries) {
-          final hour = entry.timestamp.hour;
-          double tmp = entry.calcNicotineUsage();
-          _barData[hour] += tmp;
-          entry.debugEntry();
+          _barData[entry.timestamp.hour] += entry.getNicotineOrSpending(_selectedDataType);
         }
-        _xLabels = [];
-        
-        int tmp = entries.length;
-        print("no. of entries: $tmp");
-        print(_barData);
-        print(_xLabels);
+        break;
+      }
 
-        /*
-        final int gap_between_x_labels = 4;
-        _xLabels = List.generate(24, (i) {
-          if (i % gap_between_x_labels == 0) {
-            if (i == 0) return '12am';
-            if (i == 12) return '12pm';
-            if (i < 12) return '${i}am';
-            return '${i - 12}pm';
+      case Period.week: {
+        final startDate = today.subtract(const Duration(days: 6));
+        final entries = await fetchConsumptionData(
+          startDate: startDate,
+          endDate: today.add(const Duration(days: 1)),
+        );
+        _barData = List.filled(7, 0.0);
+        _xLabels = getFilteredXLabels(Period.week, 2);
+
+        for (var entry in entries) {
+          final diff = entry.timestamp.difference(startDate).inDays;
+          if (diff >= 0 && diff < 7) {
+            _barData[diff] += entry.getNicotineOrSpending(_selectedDataType);
           }
-          return '';
-        });*/
+        }
         break;
+      }
 
-      case Period.week:
-      // For "week" -> 7 days
-        _barData = List.generate(7, (i) => (math.Random().nextDouble() * 20).roundToDouble());
-        _xLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        break;
+      case Period.month: {
+        final startDate = today.subtract(const Duration(days: 29));
+        final entries = await fetchConsumptionData(
+          startDate: startDate,
+          endDate: today.add(const Duration(days: 1)),
+        );
+        _barData = List.filled(30, 0.0);
+        _xLabels = getFilteredXLabels(Period.month, 6);
 
-      case Period.month:
-      // For "month" -> ~30 days
-        _barData = List.generate(30, (i) => (math.Random().nextDouble() * 25).roundToDouble());
-        //_xLabels = List.generate(30, (i) => (i + 1).toString());
-        _xLabels = [];
+        for (var entry in entries) {
+          final diff = entry.timestamp.difference(startDate).inDays;
+          if (diff >= 0 && diff < 30) {
+            _barData[diff] += entry.getNicotineOrSpending(_selectedDataType);
+          }
+        }
         break;
+      }
 
-      case Period.year:
-      // For "year" -> 12 months
-        _barData = List.generate(12, (i) => (math.Random().nextDouble() * 40).roundToDouble());
-        _xLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      case Period.year: {
+        final startDate = DateTime(today.year - 1, today.month, today.day);
+        final entries = await fetchConsumptionData(
+          startDate: startDate,
+          endDate: today.add(const Duration(days: 1)),
+        );
+        _barData = List.filled(12, 0.0);
+        _xLabels = getFilteredXLabels(Period.year, 1);
+
+        for (var entry in entries) {
+          final monthIndex = (entry.timestamp.month - startDate.month + 12) % 12;
+          _barData[monthIndex] += entry.getNicotineOrSpending(_selectedDataType);
+        }
         break;
+      }
     }
 
-    // If you want to differentiate Nicotine vs. Spending, add logic here.
-    // For now, the data is just random.
     if (!mounted) return;
     setState(() {});
   }
