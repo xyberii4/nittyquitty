@@ -111,6 +111,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   String oldData = "";
 
   bool _dataFetched = false;
+  bool _usageDisplayed = false;
   DateTime startDate = DateTime.now();
   late DateTime endDate;
   late double initialIntake;
@@ -119,7 +120,11 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   @override
   void initState() {
     super.initState();
-    _displayRecentUsage();
+    _displayRecentUsage().then((_) {
+      setState(() {
+        _usageDisplayed = true;
+      });
+    });
     fetchData().then((_) {
       setState(() {
         _dataFetched = true;
@@ -192,7 +197,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     );
   }
   Widget generateGoalChart(BuildContext context) {
-    if (!_dataFetched) {
+    if (!_dataFetched || !_usageDisplayed) {
       return Center(child: CircularProgressIndicator());
     }
 
