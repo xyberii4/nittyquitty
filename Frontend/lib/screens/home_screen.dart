@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:nittyquitty/noti_service.dart';
+import 'package:nittyquitty/services/noti_service.dart';
 import 'package:nittyquitty/services/db_requests.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,8 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 2; // Default to 'Home'
   final NotiService notiService = NotiService(); // Notification service instance
 
-  late DateTime startDate, endDate;
-  late double initialIntake, targetIntake;
+  DateTime startDate = DateTime.now(), endDate = DateTime.now();
+  int initialIntake = 0;
+  double targetIntake = 0;
 
   @override
   void initState() {
@@ -173,81 +174,29 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchNicotineConsumptionData();
+    _displayRecentUsage();
   }
 
-  Future<int> getUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? userId = prefs.getInt("user_id");
-    if (userId == null) {
-      debugPrint("Error loading user ID");
-      return -1;
-    }
-    debugPrint("User ID: $userId");
-    return userId;
-  }
-
-  Future<List<dynamic>> fetchConsumptionData({
-  required int userID,
-  required DateTime startDate,
-  required DateTime endDate,
-}) async {
-  const String apiBaseUrl = "http://34.105.133.181:8080";
-
-  try {
-    final request = http.Request(
-      'GET',
-      Uri.parse("$apiBaseUrl/api/getConsumption"),
-    )
-      ..headers['Content-Type'] = 'application/json'
-      ..headers['Accept'] = 'application/json'
-      ..body = jsonEncode({
-        "user_id": userID,
-        "start_date": startDate.toUtc().toIso8601String(),
-        "end_date": endDate.toUtc().toIso8601String(),
-      });
-
-    final response = await http.Client().send(request);
-
-    if (response.statusCode == 200) {
-      final responseBody = await response.stream.bytesToString();
-      return jsonDecode(responseBody) ?? []; // Ensure it always returns a list
-    } else {
-      debugPrint("Error fetching data: ${response.statusCode}");
-      return [];
-    }
-  } catch (e) {
-    debugPrint("Exception in fetchConsumptionData: $e");
-    return [];
-  }
-}
-
-
-  Future<void> _fetchNicotineConsumptionData() async {
-    userId = await getUserId();
-    if (userId == -1) return;
-
+  Future<void> _displayRecentUsage() async {
     final now = DateTime.now();
     const duration = 7;
 
-    // Fetch recent data and sum mg intake
     final recentList = await fetchConsumptionData(
-      userID: userId!,
+      userID: await getUserId(),
       startDate: now.subtract(const Duration(days: duration)),
       endDate: now,
     );
 
-    double totalRecentMg = recentList
-        .map((item) => (item['mg'] ?? 0.0)) // Extract mg values
-        .fold(0.0, (sum, mg) => sum + mg);  // Sum up mg values
+    double sum = 0.0;
+    for (var data in recentList) {
+      sum += data.calcNicotineUsage();
+    }
 
+    if (!mounted) return;
     setState(() {
-      recentData = "${totalRecentMg.toStringAsFixed(2)} mg"; // Display only the sum
+      recentData = "$sum mg"; // Display only the sum
     });
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {

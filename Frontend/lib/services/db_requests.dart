@@ -11,6 +11,10 @@ class ConsumptionEntry {
   final double cost;
   final DateTime timestamp;
 
+  double calcNicotineUsage() {
+    return this.quantity * this.mg;
+  }
+
   ConsumptionEntry({
     required this.product,
     required this.userId,
@@ -73,10 +77,11 @@ class UserDataEntry {
 }
 
 Future<List<ConsumptionEntry>> fetchConsumptionData({
-  required int userID,
+  int userID = -1,
   required DateTime startDate,
   required DateTime endDate,
 }) async {
+  userID = await getUserId();
   const String apiBaseUrl = "http://34.105.133.181:8080";
 
   final request = http.Request(
@@ -128,9 +133,9 @@ Future<double> getWeeklySpending() async {
   print("Usage: $spending");
   return spending;
 }
-Future<double> getWeeklyUsage(String nicType) async {
+Future<int> getWeeklyUsage(String nicType) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  double? usage = prefs.getDouble("${nicType}_weekly_usage");
+  int? usage = prefs.getInt("${nicType}_weekly_usage");
   if (usage == null) {
     print("Error loading weekly $nicType usage");
     return -1;

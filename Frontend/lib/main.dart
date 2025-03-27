@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nittyquitty/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/landing_screen.dart';
-import 'noti_service.dart';
+import 'services/noti_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
