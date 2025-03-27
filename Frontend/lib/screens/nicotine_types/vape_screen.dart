@@ -20,7 +20,7 @@ class _VapesScreenState extends State<VapesScreen> {
 
   Future<void> _logConsumption() async {
     if (_selectedTime == null) return;
-    bool successful = await logConsumption(product: "vape", mg: _mg, quantity: _puffs, cost: _cost, timestamp: _selectedTime);
+    bool successful = await logConsumption(product: "vape", mg: _mg/200.0, quantity: _puffs, cost: _cost, timestamp: _selectedTime);
 
     // Check if the request was successful
     if (successful) {

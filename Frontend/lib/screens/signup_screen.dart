@@ -312,7 +312,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter a goal";
+                      return "Please enter a goal (mg)";
                     }
                     return null;
                   },

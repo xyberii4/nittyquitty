@@ -211,12 +211,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                             sideTitles: SideTitles(
                               showTitles: true,
                               getTitlesWidget: (value, meta) {
-                                final label = (value * (meta.max - meta.min) / 5).toStringAsFixed(0);
-
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                                   child: Text(
-                                    label,
+                                    value.toStringAsFixed(0),
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
