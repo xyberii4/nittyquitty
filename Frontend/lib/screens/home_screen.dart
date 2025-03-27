@@ -10,6 +10,7 @@ import 'input_nic_screen.dart';
 import 'analytics_screen.dart';
 import 'community_screen.dart';
 import 'settingspage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,14 +19,39 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  {
   int _selectedIndex = 2; // Default to 'Home'
   final NotiService notiService = NotiService(); // Notification service instance
 
-  @override
+  late final AnimationController _controller;
+  late final Animation<Offset> _offsetAnimation;
+  @override   
   void initState() {
     super.initState();
     _initializeApp();
+    
+    _controller = AnimationController(
+      duration: const Duration(seconds: 16),
+      vsync: this,
+    )..repeat();
+
+    _offsetAnimation = Tween<Offset>(
+      begin: const Offset(1.4, 0),
+      end: const Offset(-1.4, 0),
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _launchNHSUrl() async {
+    final Uri url = Uri.parse('https://www.nhs.uk/better-health/quit-smoking/');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
   }
 
   Future<void> _initializeApp() async {
@@ -78,6 +104,33 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Center(child: _pages[_selectedIndex]),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom:
+                20, // positioned just above navigation bar, adjust slightly if needed
+            child: GestureDetector(
+              onTap: _launchNHSUrl,
+              child: Container(
+                color: Colors.green[800], // dark green color
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                height: 35, // reduced height clearly matching text
+                alignment: Alignment.center, // vertically centered text
+                child: ClipRect(
+                  child: SlideTransition(
+                    position: _offsetAnimation,
+                    child: const Text(
+                      '   For professional health resources to quit nicotine, please press here to visit the NHS website   ',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.visible,
+                      softWrap: false,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
