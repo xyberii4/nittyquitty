@@ -110,6 +110,11 @@ class _SnusScreenState extends State<SnusScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the number of snus portions';
+                    } int? intValue = int.tryParse(value);
+                    if (intValue == null) {
+                      return 'Please enter a valid number';
+                    } else if (intValue < 0 || intValue > 10) {
+                      return 'The number must be between 1-10';
                     }
                     return null;
                   },
@@ -169,7 +174,7 @@ class _SnusScreenState extends State<SnusScreen> {
                   validator: (value) {
                     if (value == null || value == '1 dot') {
                       return 'Please select a valid strength';
-                    }
+                    } 
                     return null;
                   },
                 ),
@@ -189,6 +194,11 @@ class _SnusScreenState extends State<SnusScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the cost';
+                    } int? intValue = int.tryParse(value);
+                    if (intValue == null) {
+                      return 'Please enter a valid number';
+                    } else if (intValue < 0 || intValue > 50) {
+                      return 'The number must be between 1-50';
                     }
                     return null;
                   },

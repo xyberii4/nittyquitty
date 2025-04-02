@@ -93,6 +93,12 @@ class _VapesScreenState extends State<VapesScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the number of puffs';
+                    } 
+                    int? intValue = int.tryParse(value);
+                    if (intValue == null) {
+                      return 'Please enter a valid number';
+                    } else if (intValue < 0 || intValue > 50) {
+                      return 'The number must be between 1-50';
                     }
                     return null;
                   },
@@ -146,6 +152,11 @@ class _VapesScreenState extends State<VapesScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the nicotine strength';
+                    } int? intValue = int.tryParse(value);
+                    if (intValue == null) {
+                      return 'Please enter a valid number';
+                    } else if (intValue < 0 || intValue > 50) {
+                      return 'The number must be between 1-50';
                     }
                     return null;
                   },
@@ -166,6 +177,11 @@ class _VapesScreenState extends State<VapesScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the cost';
+                    } int? intValue = int.tryParse(value);
+                    if (intValue == null) {
+                      return 'Please enter a valid number';
+                    } else if (intValue < 0 || intValue > 50) {
+                      return 'The number must be between 1-50';
                     }
                     return null;
                   },
